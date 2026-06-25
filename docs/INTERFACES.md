@@ -65,8 +65,18 @@ class BaseActor(ABC):
 class HeuristicActor(BaseActor):
     """Rule-based actor for Cop and Thief roles."""
 
-    def __init__(self, weights: dict | None = None) -> None:
-        """Create with optional heuristic weight overrides."""
+    def __init__(
+        self,
+        role: str | None = None,
+        weights: dict | None = None,
+        grid_size: tuple[int, int] = DEFAULT_GRID_SIZE,
+    ) -> None:
+        """Create with optional role, heuristic weight, and grid overrides.
+
+        `role` is accepted so the submodule loader's preferred
+        `actor_cls(role=role)` path works (FR-01.5); when None the role is
+        detected from `obs.actor` at runtime. `grid_size` reuses the submodule's
+        physical constant and is used only for edge/trap scoring."""
 
     def get_action(self, obs: ObservationState) -> str:
         """Return highest-scoring legal move.
@@ -95,20 +105,23 @@ class QTableActor(BaseActor):
 
     def __init__(
         self,
-        alpha: float = 0.1,
-        gamma: float = 0.9,
-        epsilon: float = 1.0,
-        epsilon_decay: float = 0.995,
-        epsilon_min: float = 0.05,
+        role: str | None = None,
+        grid_size: tuple[int, int] = DEFAULT_GRID_SIZE,
+        **overrides: float,  # any rl config key: learning_rate, discount_factor,
+                             # epsilon_start, epsilon_decay, epsilon_min,
+                             # win_reward, lose_reward, step_cost
     ) -> None:
-        """Create with RL hyperparameters."""
+        """Create with RL hyperparameters (config defaults, override per-key)."""
 
     def get_action(self, obs: ObservationState) -> str:
-        """Epsilon-greedy action selection.
+        """Epsilon-greedy action selection; flushes the pending Bellman update.
         Returns: Action string from obs.legal_moves."""
 
     def on_result(self, obs: ObservationState, action: str, result: ActionResult) -> None:
-        """Bellman update + epsilon decay + belief state update."""
+        """Record reward; apply the terminal Bellman update + epsilon decay.
+
+        NOTE: the submodule match path never calls this (a fresh actor is loaded
+        each turn), so learning happens offline in scripts/train_qtable.py."""
 
     def save(self, path: Path) -> None:
         """Persist Q-table as .npy file."""

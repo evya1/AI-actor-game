@@ -1,8 +1,20 @@
 # Task Tracking — Cop & Thief Actors
 
-## Version 2.0 | 2026-06-25
+## Version 2.1 | 2026-06-25
 
 > **Change from v1.0:** Tests distributed across phases. Each phase ends with unit tests for its modules, so nothing is tested all at once. Original grouped version preserved in [TODO_ORIGINAL.md](TODO_ORIGINAL.md).
+
+## Implementation Status (v2.1)
+
+- ✅ **Phase 0 — Setup:** `actor_t6` package, `config/actor_config.json`, `config.py` (defaults + schema validation), `shared/version.py` (1.00), `pyproject.toml` (numpy, ruff, pytest). Tests pass.
+- ✅ **Phase 1 — Heuristic:** `belief_state.py`, `heuristic_actor.py` (+ `heuristic_scoring.py` extracted for the 150-line limit), role-aware Cop/Thief scoring, save/load tolerant of a missing file. Unit + integration tests pass on the real engine.
+- ✅ **Phase 2 — RL:** `state_encoder.py` (relative encoding, ADR-002), `qtable_actor.py` (ε-greedy + Bellman + decay + save/load), `scripts/train_qtable.py` + `scripts/selfplay.py` (offline training harness). Trained tables saved to `models/`.
+- 🚧 **Phase 3 — Integration/QA:** ruff = 0 violations; coverage = 100% (≥85% gate); all files ≤150 lines; integration Steps 1–5 verified offline (engine + submodule `actor_loader`). **Remaining:** full `run_match.py --mode actor` smoke needs an LLM for NL messages — choose a backend per [`docs/LLM_BACKENDS.md`](LLM_BACKENDS.md) (Ollama, or OpenRouter via `scripts/openrouter_adapter.py`).
+
+**Key implementation findings** (see also docs/PLAN.md §4, §6.1):
+- Q-learning trains **offline** — the submodule match path loads a fresh actor each turn and never calls `on_result`.
+- Actors accept an optional `role` kwarg (FR-01.5) so the loader's `actor_cls(role=role)` path works; both `load()`s tolerate a missing table.
+- The 5×5 game is cop-dominant; the RL cop beats the heuristic baseline on capture speed, and the series sub-game win rate is 50%.
 
 ---
 

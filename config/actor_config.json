@@ -1,0 +1,20 @@
+{
+    "version": "1.00",
+    "heuristic": {
+        "distance_weight": 3.0,
+        "barrier_weight": 2.0,
+        "edge_weight": 1.5,
+        "trap_penalty": 4.0,
+        "cop_barrier_threshold": 3
+    },
+    "rl": {
+        "learning_rate": 0.1,
+        "discount_factor": 0.9,
+        "epsilon_start": 1.0,
+        "epsilon_decay": 0.995,
+        "epsilon_min": 0.05,
+        "win_reward": 10.0,
+        "lose_reward": -10.0,
+        "step_cost": 0.1
+    }
+}

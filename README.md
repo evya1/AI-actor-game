@@ -1,1 +1,139 @@
-# AI-actor-game
+# AI-actor-game — `actor_t6` (Cop & Thief decision backends)
+
+Team-specific **actor "brains"** for Exercise 6 of the AI Orchestration course
+(University of Haifa). Two agents — a **Cop** and a **Thief** — play a
+pursuit-evasion game on a 5×5 grid and talk over MCP. The game engine, MCP
+servers, agent/parser, LLM integration, and match orchestrator are all provided
+by the **read-only git submodule** `agent-orchestration-course-t6-common`. **Our
+only job is the actors** — the logic that decides each move.
+
+> New here? Read this file top-to-bottom, then `docs/PRD.md` (requirements),
+> `docs/PLAN.md` (architecture/ADRs), and `docs/INTERFACES.md` (class contracts).
+> LLM setup for live matches is in `docs/LLM_BACKENDS.md`.
+
+---
+
+## What we built
+
+Five independent modules under `src/actor_t6/` (each ≤150 lines, single
+responsibility, no actor imports another actor):
+
+| Module | Responsibility |
+|--------|----------------|
+| `config.py` | Load `config/actor_config.json`, merge over defaults, validate schema |
+| `belief_state.py` | Track opponent position estimate under partial observability |
+| `heuristic_actor.py` (+ `heuristic_scoring.py`) | Rule-based Cop/Thief actor — scores legal moves (distance, edges, barriers, traps) |
+| `state_encoder.py` | Map an observation to a compact Q-table index (relative encoding, ADR-002) |
+| `qtable_actor.py` | Tabular Q-learning actor — ε-greedy, Bellman update, save/load |
+
+Plus tooling in `scripts/` (not part of the package contract):
+
+| Script | Purpose |
+|--------|---------|
+| `selfplay.py` | Drive the submodule `Game` engine directly (used by tests + trainer) |
+| `train_qtable.py` | **Offline** Q-learning trainer → writes `models/{cop,thief}_qtable.npy` |
+| `openrouter_adapter.py` | Ollama-compatible shim → OpenRouter (see LLM backends below) |
+
+Dependency graph (enforced):
+
+```
+heuristic_actor → belief_state, config
+qtable_actor   → state_encoder, belief_state, config
+state_encoder, belief_state → (leaf, no internal deps)
+```
+
+---
+
+## How the submodule loads our actor
+
+The submodule's server imports our class at runtime via **environment variables**
+— no code changes to the submodule, ever:
+
+```
+ACTOR_CLASS=actor_t6.qtable_actor.QTableActor   # dotted path to a BaseActor subclass
+ACTOR_TABLE=models/cop_qtable.npy               # optional → triggers .load(role, path)
+```
+
+`run_match.py --mode actor` injects `ACTOR_CLASS`, `ACTOR_TABLE`, and
+`PYTHONPATH=../src` into both server subprocesses automatically. Our actors
+subclass `BaseActor` (`get_action(obs) -> str`, `on_result(...)`), accept an
+optional `role` kwarg, and `load()` tolerates a missing table (cold start).
+
+---
+
+## Two important facts (read before extending the RL side)
+
+1. **Q-learning trains offline.** The submodule match path (`get_actor_action`)
+   loads a *fresh* actor every turn and **never calls `on_result`**, so online
+   learning during a match is impossible. We train offline with
+   `scripts/train_qtable.py` (driving the real `Game` engine) and matches load
+   the static table with **ε=0** (pure exploitation).
+2. **The 5×5 game is cop-dominant.** With equal king-move speed and full
+   visibility a competent pursuer always captures, so *any* thief wins ~0%.
+   Honest results after 3000 training episodes:
+   - RL **cop beats the heuristic baseline** on capture speed (~3.97 vs ~4.80 rounds).
+   - RL thief underperforms the heuristic evader (all-loss outcomes give Q-learning
+     little gradient) — survival-time reward shaping is future work.
+   - Series-level sub-game win rate (alternating roles) = **50%**, meeting the KPI.
+
+---
+
+## Quick start
+
+```bash
+uv sync                                   # install deps (numpy, pytest, ruff)
+uv run pytest --cov=actor_t6              # 52 tests, 100% coverage on our modules
+uv run ruff check src tests scripts       # 0 violations
+uv run python scripts/train_qtable.py     # train → models/{cop,thief}_qtable.npy
+```
+
+Run a full match (needs an LLM for the cosmetic NL message — see
+`docs/LLM_BACKENDS.md`). From inside the submodule:
+
+```bash
+cd agent-orchestration-course-t6-common
+uv run python scripts/run_match.py --mode actor \
+    --actor-class actor_t6.qtable_actor.QTableActor \
+    --models-dir ../models --seed 42
+```
+
+Swap `--actor-class actor_t6.heuristic_actor.HeuristicActor` for the rule-based
+baseline (no training needed).
+
+---
+
+## LLM backends (cosmetic NL message only)
+
+The actor decides the move; the LLM only narrates it ("Moving north…"). Any free
+model suffices. Pick **one** backend — full setup in `docs/LLM_BACKENDS.md`:
+
+| Backend | Cost | Setup |
+|---------|------|-------|
+| **Ollama** (local / VPS) | free | `OLLAMA_BASE_URL`, `LLM_MODEL=llama3.2` — natively supported |
+| **OpenRouter** (cloud, free tier) | free | run `scripts/openrouter_adapter.py`, set `OLLAMA_BASE_URL` to it + `OPENROUTER_API_KEY` |
+| **Anthropic** (cloud) | paid | `ANTHROPIC_API_KEY` — natively supported |
+
+Copy `env.example` → `.env` and fill in your chosen backend.
+
+---
+
+## Your strategy stays private
+
+Our code lives **only in this repo** and is loaded into the submodule's process
+at runtime via `PYTHONPATH` — it is never copied into the submodule (a separate,
+read-only repo). In a real cross-team match each team runs its own server; the
+servers exchange only **actions and NL messages** over MCP, never code or
+Q-tables. Keep it that way: never place our files inside
+`agent-orchestration-course-t6-common/`, and keep this repo private to the team.
+
+---
+
+## Status & future work
+
+Done: Phases 0–3 (config, heuristic, RL + offline trainer, integration), 52
+tests / 100% coverage / ruff-clean / all files ≤150 lines; OpenRouter adapter.
+See `docs/TODO.md` for the live checklist.
+
+Future: survival-time reward shaping for the RL thief; belief-state integration
+once the submodule enables partial observability (`view_radius`); learning-curve
+notebook; full end-to-end match recording for the report.
