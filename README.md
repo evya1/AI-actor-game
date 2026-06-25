@@ -113,7 +113,7 @@ model suffices. Pick **one** backend — full setup in `docs/LLM_BACKENDS.md`:
 | **OpenRouter** (cloud, free tier) | free | run `scripts/openrouter_adapter.py`, set `OLLAMA_BASE_URL` to it + `OPENROUTER_API_KEY` |
 | **Anthropic** (cloud) | paid | `ANTHROPIC_API_KEY` — natively supported |
 
-Copy `env.example` → `.env` and fill in your chosen backend.
+Copy `.env.example` → `.env` and fill in your chosen backend.
 
 ---
 
