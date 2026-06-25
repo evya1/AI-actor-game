@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 from actor.base_actor import BaseActor
-from game.constants import BARRIER_ACTION, COP, DEFAULT_GRID_SIZE, DIRECTIONS
+from game.constants import BARRIER_ACTION, COP, DEFAULT_GRID_SIZE, DIRECTIONS, STAY_ACTION
 
 from actor_t6.config import load_config
 from actor_t6.state_encoder import StateEncoder
@@ -24,8 +24,9 @@ from actor_t6.state_encoder import StateEncoder
 if TYPE_CHECKING:
     from game.state import ActionResult, ObservationState
 
-# Canonical action order for Q-table columns (PLAN §6.2).
-ACTIONS: list[str] = [*DIRECTIONS, BARRIER_ACTION]
+# Canonical action order for Q-table columns (PLAN §6.2). STAY is thief-only but
+# kept in the shared space so its index exists for both roles (cop never picks it).
+ACTIONS: list[str] = [*DIRECTIONS, BARRIER_ACTION, STAY_ACTION]
 _ACTION_INDEX: dict[str, int] = {a: i for i, a in enumerate(ACTIONS)}
 
 

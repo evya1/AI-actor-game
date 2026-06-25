@@ -1,5 +1,5 @@
 {
-    "version": "1.00",
+    "version": "1.01",
     "heuristic": {
         "distance_weight": 3.0,
         "barrier_weight": 2.0,
@@ -16,5 +16,15 @@
         "win_reward": 10.0,
         "lose_reward": -10.0,
         "step_cost": 0.1
+    },
+    "launcher": {
+        "adapter_host": "localhost",
+        "adapter_port": 11500,
+        "adapter_script": "scripts/openrouter_adapter.py",
+        "adapter_ready_timeout": 20.0,
+        "local_server_ports": [8001, 8002],
+        "default_server_port": 8080,
+        "default_games_dir": "games/server_a",
+        "turn_poll_interval": 0.5
     }
 }

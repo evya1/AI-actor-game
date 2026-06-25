@@ -115,6 +115,18 @@ model suffices. Pick **one** backend — full setup in `docs/LLM_BACKENDS.md`:
 
 Copy `.env.example` → `.env` and fill in your chosen backend.
 
+> **Note:** the MCP server itself never calls the LLM — the Gatekeeper lives in
+> the orchestrator/client. Use the one-command launcher to run the full stack:
+>
+> ```bash
+> uv run python scripts/run_stack.py local --mode actor --seed 42          # self-play
+> uv run python scripts/run_stack.py cross-team --opponent-url <URL> \      # vs partner
+>     --my-role thief --game-id m42_sg01 --seed 42 --port 8080
+> ```
+>
+> It auto-detects the backend and boots the OpenRouter adapter when needed. See
+> `docs/LLM_BACKENDS.md` for why the bare server makes no LLM calls.
+
 ---
 
 ## Your strategy stays private
@@ -131,7 +143,8 @@ Q-tables. Keep it that way: never place our files inside
 ## Status & future work
 
 Done: Phases 0–3 (config, heuristic, RL + offline trainer, integration), 52
-tests / 100% coverage / ruff-clean / all files ≤150 lines; OpenRouter adapter.
+tests / 100% coverage / ruff-clean / all files ≤150 lines; OpenRouter adapter;
+full-stack launcher (`run_stack.py`) with local + cross-team modes.
 See `docs/TODO.md` for the live checklist.
 
 Future: survival-time reward shaping for the RL thief; belief-state integration

@@ -6,4 +6,4 @@ project versioning rule (CLAUDE.md §6).
 
 from __future__ import annotations
 
-__version__ = "1.00"
+__version__ = "1.01"

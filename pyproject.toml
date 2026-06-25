@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "actor-for-ex06"
-version = "1.0.0"
+version = "1.0.1"
 description = "Cop & Thief actor decision backends (actor_t6) for HW6"
 readme = "README.md"
 requires-python = ">=3.12"

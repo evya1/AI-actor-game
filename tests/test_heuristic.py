@@ -14,6 +14,20 @@ def test_resolve_pos_moves_and_barrier_stays():
     assert scoring.resolve_pos((2, 2), "BARRIER") == (2, 2)
 
 
+def test_resolve_pos_stay_keeps_position():
+    # The submodule offers the thief a STAY action; it must not displace.
+    assert scoring.resolve_pos((2, 2), "STAY") == (2, 2)
+
+
+def test_thief_handles_stay_in_legal_moves():
+    actor = HeuristicActor(role="thief")
+    obs = make_obs(
+        actor="thief", my_pos=(2, 2), opponent_pos=(0, 0),
+        legal_moves=["N", "E", "S", "W", "STAY"],
+    )
+    assert actor.get_action(obs) in obs.legal_moves  # scores STAY without crashing
+
+
 def test_chebyshev():
     assert scoring.chebyshev((0, 0), (3, 1)) == 3
     assert scoring.chebyshev((2, 2), (2, 2)) == 0
