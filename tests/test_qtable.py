@@ -24,6 +24,17 @@ def test_epsilon_one_explores_legally():
         assert actor.get_action(obs) in obs.legal_moves
 
 
+def test_thief_handles_stay_action():
+    # The submodule offers the thief STAY; it must have a Q-column and be choosable.
+    assert "STAY" in ACTIONS
+    actor = QTableActor(role="thief", grid_size=GRID, epsilon_start=0.0)
+    obs = make_obs(actor="thief", my_pos=(2, 2), opponent_pos=(0, 0),
+                   legal_moves=["N", "E", "STAY"])
+    state = StateEncoder.encode(obs, GRID)
+    actor.q_table[state, ACTIONS.index("STAY")] = 9.0
+    assert actor.get_action(obs) == "STAY"
+
+
 def test_greedy_picks_highest_q_action():
     actor = QTableActor(role="cop", grid_size=GRID, epsilon_start=0.0)
     obs = make_obs(actor="cop", my_pos=(2, 2), opponent_pos=(4, 4),

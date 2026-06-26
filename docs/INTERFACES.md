@@ -207,5 +207,22 @@ graph LR
 
 ---
 
-*Document Version: 1.0*
-*Last Updated: 2026-06-25*
+## 4. Launcher Tooling (client-side, not part of the actor package)
+
+These live in `scripts/` and orchestrate the LLM stack. They consume the
+submodule's **existing, unchanged** tools (no contract changes). The MCP server
+never calls the LLM — the Gatekeeper lives here, in the client.
+
+| Module | Responsibility | Env |
+|--------|----------------|-----|
+| `scripts/launch_common.py` | Stdlib helpers: `.env`/config parsing, `select_backend`, adapter lifecycle (`start_adapter`/`stop_process`), `wait_for_port`, `submodule_cmd` | main repo |
+| `scripts/run_stack.py` | CLI launcher: `local` (adapter → `run_match.py`) and `cross-team` (adapter → own server → `run_peer_match.py`) | main repo |
+| `scripts/run_peer_match.py` | Cross-team half-orchestrator: drives only the local side (`get_actor_action` → Gatekeeper NL → `take_action`), waits for the opponent | submodule |
+| `scripts/peer_sync.py` | Pure turn-sync helpers: `state_fingerprint`, `read_terminal`, `wait_for_opponent` (injectable, unit-tested) | main repo |
+
+Launcher constants are in `config/actor_config.json` under `launcher`.
+
+---
+
+*Document Version: 1.1*
+*Last Updated: 2026-06-26*

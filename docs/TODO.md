@@ -10,6 +10,7 @@
 - ✅ **Phase 1 — Heuristic:** `belief_state.py`, `heuristic_actor.py` (+ `heuristic_scoring.py` extracted for the 150-line limit), role-aware Cop/Thief scoring, save/load tolerant of a missing file. Unit + integration tests pass on the real engine.
 - ✅ **Phase 2 — RL:** `state_encoder.py` (relative encoding, ADR-002), `qtable_actor.py` (ε-greedy + Bellman + decay + save/load), `scripts/train_qtable.py` + `scripts/selfplay.py` (offline training harness). Trained tables saved to `models/`.
 - 🚧 **Phase 3 — Integration/QA:** ruff = 0 violations; coverage = 100% (≥85% gate); all files ≤150 lines; integration Steps 1–5 verified offline (engine + submodule `actor_loader`). **Remaining:** full `run_match.py --mode actor` smoke needs an LLM for NL messages — choose a backend per [`docs/LLM_BACKENDS.md`](LLM_BACKENDS.md) (Ollama, or OpenRouter via `scripts/openrouter_adapter.py`).
+- ✅ **Phase 5 — Launcher tooling:** `scripts/run_stack.py` (one-command `local` + `cross-team`), `run_peer_match.py` (cross-team half-orchestrator), `launch_common.py`, `peer_sync.py`. Documents why the bare MCP server makes no LLM calls (Gatekeeper lives in the client). 31 new unit tests; ruff-clean; all files ≤150 lines. See [`docs/INTERFACES.md`](INTERFACES.md) §4.
 
 **Key implementation findings** (see also docs/PLAN.md §4, §6.1):
 - Q-learning trains **offline** — the submodule match path loads a fresh actor each turn and never calls `on_result`.

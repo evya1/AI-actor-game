@@ -11,10 +11,11 @@ Direction deltas are reused from the read-only submodule
 
 from __future__ import annotations
 
-from game.constants import BARRIER_ACTION, COP, DIRECTIONS
+from game.constants import BARRIER_ACTION, COP, DIRECTIONS, STAY_ACTION
 
-# Movement directions only (BARRIER does not displace the actor).
+# Movement directions only (BARRIER / STAY do not displace the actor).
 _MOVE_DELTAS = DIRECTIONS
+_NON_MOVING_ACTIONS = frozenset({BARRIER_ACTION, STAY_ACTION})
 
 
 def resolve_pos(pos: tuple[int, int], action: str) -> tuple[int, int]:
@@ -22,12 +23,13 @@ def resolve_pos(pos: tuple[int, int], action: str) -> tuple[int, int]:
 
     Args:
         pos: Current (col, row).
-        action: A direction key or ``BARRIER`` (which does not move the actor).
+        action: A direction key, ``BARRIER``, or the thief's ``STAY`` — the
+            latter two leave the actor in place.
 
     Returns:
-        The resulting (col, row); identical to ``pos`` for ``BARRIER``.
+        The resulting (col, row); identical to ``pos`` for ``BARRIER``/``STAY``.
     """
-    if action == BARRIER_ACTION:
+    if action in _NON_MOVING_ACTIONS:
         return pos
     dc, dr = _MOVE_DELTAS[action]
     return (pos[0] + dc, pos[1] + dr)

@@ -1,6 +1,6 @@
 # LLM Backends — NL message generation
 
-## Version 1.0 | 2026-06-25
+## Version 1.1 | 2026-06-26
 
 The Cop & Thief match requires each move to carry a short **natural-language
 message** ("Moving north cautiously"). This text is **cosmetic** — our actor
@@ -21,6 +21,48 @@ single LLM entry point. It selects a backend **at construction**:
 
 `run_match.py` builds `Gatekeeper(model=os.environ.get("LLM_MODEL") or None)`, so
 **`LLM_MODEL`** picks the model and **`OLLAMA_BASE_URL`** picks the endpoint.
+
+### The MCP server never calls the LLM — by design
+
+A common confusion: starting the bare server makes **no** OpenRouter (or any LLM)
+calls, even with `LLM_MODEL` / `OLLAMA_BASE_URL` set:
+
+```bash
+# This serves game tools over HTTP and waits. It calls NO LLM.
+uv run python -m game.wrappers.mcp_server --port 8080 --games-dir games/server_a
+```
+
+The Gatekeeper is imported only by the orchestrator/client
+(`run_match.py`, `game_host.py`) and the actor LLM wrappers — **never** by
+anything in `game/wrappers/` (the server). The submodule architecture states it:
+*"LLM lives in the client/orchestrator, not inside the MCP server."* So `run_match.py`
+works because it *is* the orchestrator (loads `.env`, spawns both servers, builds
+the Gatekeeper). The bare server has no Gatekeeper, so the `LLM_MODEL` /
+`OLLAMA_BASE_URL` you pass it are ignored.
+
+For a real cross-team match (your server vs a remote partner) you still need a
+client driving the LLM for your side — the server's `take_action` only *forwards*
+your already-decided move to the opponent. That client is `run_peer_match.py`.
+
+### One-command launcher (`scripts/run_stack.py`)
+
+`run_stack.py` wires the missing pieces so a match "just works" — it boots the
+OpenRouter adapter when needed (backend auto-detected from your env keys), then
+runs the orchestrator. It is stdlib-only and runs the game processes under the
+submodule's uv environment.
+
+```bash
+# Local self-play: adapter + run_match (spawns both servers + the LLM driver).
+uv run python scripts/run_stack.py local --mode actor --seed 42
+
+# Cross-team: adapter + your own server (pointed at the remote) + your LLM driver.
+uv run python scripts/run_stack.py cross-team \
+    --opponent-url http://62.56.220.143:61222 \
+    --my-role thief --game-id match0042_sg01 --seed 42 --port 8080
+```
+
+Force a backend with `--backend openrouter|ollama|anthropic` (default `auto`).
+Launcher constants live in `config/actor_config.json` under `launcher`.
 
 ## The three options
 
