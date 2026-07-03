@@ -1,7 +1,10 @@
 # Product Requirements Document (PRD) — Cop & Thief Actors
 
-## Version 1.2 | 2026-07-03
+## Version 1.3 | 2026-07-03
 
+> **Change from v1.2:** §1.1 links `docs/EX06_ASSIGNMENT.md`, the full
+> assignment brief copied from the shared submodule.
+>
 > **Change from v1.1:** §4.3 references the new mechanical quality-gate
 > enforcement (`docs/PLAN.md` §8).
 
@@ -11,7 +14,7 @@
 
 ### 1.1 Context
 
-This project implements the **actor decision-making backends** for Exercise 6 (ex06) of the "AI Orchestration" course at the University of Haifa. Two autonomous agents — a **Cop** and a **Thief** — play a pursuit-evasion game on a 2D grid, communicating via MCP servers.
+This project implements the **actor decision-making backends** for Exercise 6 (ex06) of the "AI Orchestration" course at the University of Haifa. Two autonomous agents — a **Cop** and a **Thief** — play a pursuit-evasion game on a 2D grid, communicating via MCP servers. The full assignment brief is transcribed in [`docs/EX06_ASSIGNMENT.md`](EX06_ASSIGNMENT.md); this PRD covers only our actor-specific scope.
 
 The game engine, MCP infrastructure, actor wrapper, and LLM integration are provided by a read-only submodule (`agent-orchestration-course-t6-common`). Our scope is **only the actors** — the intelligence that decides each move.
 
@@ -394,5 +397,5 @@ A game consists of **6 sub-games**. Maximum combined score: **90**. Minimum: **3
 
 ---
 
-*Document Version: 1.2*
+*Document Version: 1.3*
 *Last Updated: 2026-07-03*
