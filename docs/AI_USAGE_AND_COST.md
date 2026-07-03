@@ -89,29 +89,42 @@ Unavailable usage values are intentionally not estimated from transcript length.
 | Commits added | 3 (`da71883` launcher fix + test, `2588d8d` docs, `30709f6` README sample run) |
 | Pull request | [#8](https://github.com/evya1/AI-actor-game/pull/8), CI green, mergeable |
 | Local smoke | OpenRouter, `deepseek/deepseek-v3.2`, seed 42 — exit 0 |
-| Input tokens | Not reported by the execution environment |
-| Cached-input tokens | Not reported by the execution environment |
-| Output tokens | Not reported by the execution environment |
-| Reasoning tokens | Not reported by the execution environment |
-| Reported total | Not reported by the execution environment |
+| Non-cached input tokens | 28,125 |
+| Output tokens | 253,166 |
+| Cache-creation input tokens | 800,673 |
+| Cache-read input tokens | 26,683,975 |
+| Reasoning tokens | Not separately reported in the usage records |
+| Reported total (input + output) | 281,291 |
 
-Cost status: Not calculated -- token metadata was not surfaced by the execution
-environment, and exact billing rates were not verified. Unavailable usage values
-are intentionally not estimated from transcript length. If the execution
-summary is supplied later, record the exact reported line here as for Run 1.
+Source: summed per-message `message.usage` records from this session's local
+Claude Code transcripts (`~/.claude/projects/-home-dev-pop-os-hw6-actors/`,
+files `3810214b….jsonl` + `701a28fc….jsonl`), model `claude-opus-4-8`. The
+figures are a snapshot captured mid-session and continue to grow while the
+conversation is active; cache-read/cache-creation tokens are tracked separately
+and are not added into the reported total.
+
+Arithmetic note: `28,125 input + 253,166 output = 281,291 reported total`.
+
+Cost status: Not calculated -- the local transcripts contain no `costUSD`
+field, which indicates a subscription (plan-metered) session rather than
+per-token API billing, so no per-session monetary cost is recorded. No dollar
+value is estimated without a verified billing model and rates. If run under API
+billing, apply the Cost Calculation Template below to these token counts.
 
 ## Run Comparison
 
-| Metric | Run 1 | Run 2 | Run 3 |
+| Metric | Run 1 | Run 2 | Run 3 (snapshot) |
 |---|---:|---:|---:|
-| Non-cached input | 211,910 | Not reported | Not reported |
-| Cached input | 14,971,648 | Not reported | Not reported |
-| Output | 47,354 | Not reported | Not reported |
-| Reasoning | 5,896 | Not reported | Not reported |
-| Reported total | 259,264 | Not reported | Not reported |
+| Non-cached input | 211,910 | Not reported | 28,125 |
+| Cached input | 14,971,648 | Not reported | 27,484,648 |
+| Output | 47,354 | Not reported | 253,166 |
+| Reasoning | 5,896 | Not reported | Not separately reported |
+| Reported total | 259,264 | Not reported | 281,291 |
 
-No cost or efficiency delta is calculated because Run 2 and Run 3 token metadata
-and exact billing rates were not verified.
+Run 3 cached input is `cache_creation (800,673) + cache_read (26,683,975)`.
+No cost delta is calculated: Run 2 token metadata was unavailable, and Run 1/Run 3
+were subscription (plan-metered) sessions with no per-token dollar cost recorded;
+exact billing rates were not verified.
 
 ## Efficiency Observations
 
