@@ -17,14 +17,14 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import importlib
 import json
 import os
 import sys
 
 import launch_common
+import mcp_client_loader
 import peer_sync
-from fastmcp import Client
-from fastmcp.client.auth.bearer import BearerAuth
 
 # run_match.py lives in the submodule's scripts dir (not an importable package),
 # so add it to sys.path and reuse its building blocks. This guarantees identical
@@ -33,13 +33,16 @@ _SUBMODULE_SCRIPTS = launch_common.REPO_ROOT / "agent-orchestration-course-t6-co
 if str(_SUBMODULE_SCRIPTS) not in sys.path:
     sys.path.insert(0, str(_SUBMODULE_SCRIPTS))
 
-import run_match  # noqa: E402
 
-
-async def _safe_state(client: Client, actor: str, game_id: str) -> dict:
+async def _safe_state(client: object, actor: str, game_id: str) -> dict:
     """Fetch the local observation for ``actor`` as a dict ({} on empty body)."""
     res = await client.call_tool("get_state", {"game_id": game_id, "actor": actor})
     return json.loads(res.content[0].text if res.content else "{}")
+
+
+def _run_match() -> object:
+    """Import canonical run_match after launcher env has been loaded."""
+    return importlib.import_module("run_match")
 
 
 def _classify(res: dict) -> dict | None:
@@ -57,6 +60,7 @@ async def play(
     local_url: str, my_role: str, game_id: str, seed: int,
     grid: tuple[int, int], games_dir: str,
     max_rounds: int, timeout: float, poll: float,
+    view_radius: int, max_moves: int, max_forfeits: int,
 ) -> dict:
     """Propose the match and drive the local side until the game ends.
 
@@ -70,21 +74,29 @@ async def play(
         max_rounds: Round cap before declaring the game exhausted.
         timeout: Per-turn timeout in seconds (yours and the opponent wait).
         poll: Poll interval while waiting for the opponent's move.
+        view_radius: Canonical agreed visibility radius.
+        max_moves: Canonical engine round cap to propose.
+        max_forfeits: Consecutive local forfeits before technical loss.
 
     Returns:
         The final ActionResult/terminal dict, or a technical-loss sentinel.
     """
     from game.shared.gatekeeper import Gatekeeper
 
+    run_match = _run_match()
+    client_cls, auth_cls = mcp_client_loader.client_auth()
     gk = Gatekeeper(model=os.environ.get("LLM_MODEL") or None)
     cop_pos, thief_pos = run_match._derive_positions(seed, grid)
     system = run_match._SYSTEM_COP if my_role == "cop" else run_match._SYSTEM_THIEF
     base = launch_common.REPO_ROOT / games_dir
-    auth = BearerAuth(run_match._API_KEY)
-    async with Client(local_url + "/mcp", auth=auth) as c:
-        await c.call_tool("propose_match_tool", {
+    auth = auth_cls(os.environ.get("MCP_API_KEY", run_match._API_KEY))
+    forfeits = 0
+    min_log_position: int | None = None
+    async with client_cls(local_url + "/mcp", auth=auth) as c:
+        await run_match._propose_match(c, {
             "game_id": game_id, "seed": seed, "cop_pos": cop_pos,
             "thief_pos": thief_pos, "grid_size": list(grid), "my_role": my_role,
+            "view_radius": view_radius, "max_moves": max_moves,
         })
         print(f"[peer] match {game_id} proposed; my_role={my_role}")  # noqa: T201
         for round_num in range(1, max_rounds + 1):
@@ -93,18 +105,29 @@ async def play(
                 if (term := peer_sync.read_terminal(base, game_id)):
                     return term
                 if side == my_role:
+                    before_log = peer_sync.log_position(base, game_id)
                     res = await run_match._actor_turn(c, my_role, game_id, gk, system, timeout)
                     print(f"  {my_role}: {res}")  # noqa: T201
+                    if res.get("forfeit"):
+                        forfeits += 1
+                        if forfeits >= max_forfeits:
+                            reason = f"consecutive_forfeits:{my_role}"
+                            return {"technical_loss": True, "reason": reason}
+                        continue
+                    forfeits = 0
                     if (loss := _classify(res)) is not None:
                         return loss
                     if res.get("game_over"):
                         return res
+                    min_log_position = before_log + 2
                 else:
                     before = peer_sync.state_fingerprint(await _safe_state(c, my_role, game_id))
                     out = await peer_sync.wait_for_opponent(
                         lambda: _safe_state(c, my_role, game_id),
                         lambda: peer_sync.read_terminal(base, game_id),
                         before, timeout, poll,
+                        lambda: peer_sync.log_position(base, game_id),
+                        min_log_position,
                     )
                     print(f"  opponent: {out['status']}")  # noqa: T201
                     if out["status"] == "game_over":
@@ -117,21 +140,26 @@ async def play(
 def main() -> None:
     """Parse CLI args, load env, and run one cross-team sub-game."""
     launch_common.load_env()
+    run_match = _run_match()
     cfg = launch_common.launcher_config()
-    grid_cfg = run_match._load_config().get("grid_size", [5, 5])
+    game_cfg = run_match._load_config()
+    grid_cfg = game_cfg.get("grid_size", [5, 5])
     parser = argparse.ArgumentParser(description="Cross-team peer orchestrator (local side)")
     parser.add_argument("--local-url", default=f"http://localhost:{cfg['default_server_port']}")
     parser.add_argument("--my-role", choices=["cop", "thief"], required=True)
     parser.add_argument("--game-id", required=True)
     parser.add_argument("--seed", type=int, required=True)
     parser.add_argument("--games-dir", default=cfg["default_games_dir"])
-    parser.add_argument("--max-rounds", type=int, default=30)
-    parser.add_argument("--turn-timeout", type=float, default=30.0)
+    parser.add_argument("--max-rounds", type=int, default=int(game_cfg.get("max_moves", 25)))
+    parser.add_argument("--turn-timeout", type=float,
+                        default=float(game_cfg.get("turn_timeout_seconds", 30)))
     args = parser.parse_args()
     result = asyncio.run(play(
         args.local_url, args.my_role, args.game_id, args.seed,
         (grid_cfg[0], grid_cfg[1]), args.games_dir,
         args.max_rounds, args.turn_timeout, float(cfg["turn_poll_interval"]),
+        int(game_cfg.get("view_radius", 1)), int(game_cfg.get("max_moves", 25)),
+        int(game_cfg.get("max_consecutive_forfeits", 3)),
     ))
     print(f"\n[peer] result: {result}")  # noqa: T201
 
