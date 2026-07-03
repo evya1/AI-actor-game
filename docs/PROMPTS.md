@@ -13,6 +13,7 @@ not a full transcript. Session with Claude Code (Sonnet 5).
 | 2026-07-03 | Untrack a duplicated tracked archive under `.agents/` now that its contents are already extracted elsewhere in the repo. | Archive removed from git (kept on disk, gitignored); allowlist entry dropped from `scripts/check_source_archives.py`. PR #3. |
 | 2026-07-03 | Sync `docs/PRD.md`, `docs/PLAN.md`, `docs/TODO.md`, and `SUBMISSION_CHECKLIST.md` with the quality-gate work above (tooling-only, so not required by the Interface Change Protocol, but expected by the project's SDLC discipline). | New `docs/PLAN.md` §8 + ADR-005, `docs/TODO.md` Phase 6, `docs/PRD.md` §4.3 cross-reference, checklist items marked true. PR #4. |
 | 2026-07-03 | Create this prompt log. | `docs/PROMPTS.md` (this file). |
+| 2026-07-03 | Perform correctness-first remediation of confirmed Fable review findings across RL semantics, actor semantics, peer protocol, launcher lifecycle, model artifacts, docs, and local commits. | Fixed all verified findings, added focused regressions, retrained deterministic Q-tables, recorded evidence, and prepared local atomic commits without pushing remote state. |
 
 ## Notes
 

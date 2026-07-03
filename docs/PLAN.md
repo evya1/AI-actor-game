@@ -3,6 +3,9 @@
 ## Version 1.1 | 2026-07-03
 
 > **Change from v1.0:** Added §8 Quality Gates & CI Tooling.
+>
+> **Change from v1.1:** Added correctness remediation notes for RL updates,
+> belief lifecycle, peer protocol alignment, and launcher process ownership.
 
 ---
 
@@ -215,6 +218,35 @@ The key property is what GoF calls **"algorithms vary independently of the clien
 - **Pro:** Testable independently
 - **Con:** Adds an indirection layer — acceptable given the shared need
 - **Alt considered:** Mixin class — rejected because composition is cleaner and more testable
+
+**Remediation update (2026-07-03):** The pinned engine initializes a sub-game at
+round `0` and increments rounds normally, so `BeliefState` resets on observed
+round regression rather than on `round <= 1`. This preserves a round-0 sighting
+through normal round-1 progression while still clearing stale estimates on a new
+sub-game or explicit `reset()`.
+
+### ADR-006: Correct Learning Targets and Terminal Feedback
+
+**Status:** Accepted  
+**Date:** 2026-07-03
+
+Self-play tracks each actor's latest unresolved transition. Non-terminal
+feedback still goes only to the mover, but a terminal result is delivered once
+to every actor with an unresolved action. Q-learning Bellman targets now compute
+`max Q(s', a')` only over the next observation's `legal_moves`; illegal
+role-specific or blocked actions never influence the target.
+
+### ADR-007: Canonical Peer Protocol and Launcher Ownership
+
+**Status:** Accepted  
+**Date:** 2026-07-03
+
+Cross-team orchestration derives `grid_size`, `view_radius`, `max_moves`,
+timeouts, and forfeit tolerance from the pinned submodule configuration and
+uses its proposal compatibility helper. Environment loading precedes
+environment-sensitive imports. Launcher helpers own the processes they spawn:
+child configuration is explicit, readiness failure cleans up the child, and
+subprocess exit status is returned through `main()`.
 
 ### ADR-004: Config via JSON + Environment Variables
 

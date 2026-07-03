@@ -159,7 +159,10 @@ class StateEncoder:
 
 ```python
 class BeliefState:
-    """Tracks estimated opponent position under partial observability."""
+    """Tracks estimated opponent position under partial observability.
+
+    A new sub-game is detected by canonical round regression, not by round 1.
+    """
 
     def update(self, obs: ObservationState) -> None:
         """Incorporate new observation. Sets estimate from opponent_pos if known."""

@@ -101,11 +101,10 @@
 | 4.3 | Learning curve visualization | P2 | Not Started | Graph of win rate vs. training episodes |
 | 4.4 | README.md — scientific report | P1 | Not Started | DecPOMDP formalization, orchestration analysis, screenshots |
 
-**External blocker on 4.1/4.2:** both depend on the submodule implementing
-`view_radius` filtering (Chebyshev distance) in `get_state`, which is
-tracked in `agent-orchestration-course-t6-common/docs/TODO.md` Phase 14 as
-still open. Not something this repo can implement — the submodule is
-read-only (CLAUDE.md).
+**Current pinned submodule note:** `view_radius` filtering is present in
+`Game.get_state` for Cop observations. Phase 7 fixed the local belief lifecycle
+rule so a normal round 0 → round 1 progression no longer clears the last
+sighting.
 
 ---
 
@@ -118,8 +117,9 @@ outside this repo's scope (`docs/PRD.md` §1.5). Its own
 three assignment-level items still open there — listed here only as a
 pointer so a submission-readiness check doesn't miss them:
 
-- Partial observation (`view_radius` Chebyshev filtering in `get_state`) —
-  assignment §3. Blocks TODO 4.1/4.2 above.
+- Partial observation (`view_radius` Chebyshev filtering in `get_state`) is
+  present in the pinned submodule for Cop observations; broader assignment
+  hardening remains owned there.
 - Cloud deployment of both MCP servers with public URLs — assignment §8.
   Already flagged unchecked in `SUBMISSION_CHECKLIST.md`.
 - Bonus inter-group competition — assignment §12 (optional, +10).
@@ -136,6 +136,17 @@ None of these are actor-side work; they can't be closed from this repo.
 | 6.2 | Wire `.pre-commit-config.yaml` (11 hooks) + install locally | P1 | Done | `uv run pre-commit install` run; hooks fire on commit (verified live in PR [#3](https://github.com/evya1/AI-actor-game/pull/3)) |
 | 6.3 | Add keyless CI workflow (`.github/workflows/ci.yml`), PR/issue templates, `SUBMISSION_CHECKLIST.md` | P1 | Done | Workflow green on `main`; minimal `permissions: contents: read` |
 | 6.4 | Enable CI's gated pytest/coverage job via `SUBMODULE_SSH_KEY` repo secret | P2 | Not Started | Requires a read-only deploy key on `AmitKuper/agent-orchestration-course-t6-common`, added as a repo secret on `AI-actor-game`; blocked on submodule-repo admin access |
+
+## Phase 7: Correctness & Integration Remediation
+
+| # | Task | Priority | Status | DoD |
+|---|------|----------|--------|-----|
+| 7.1 | Correct RL terminal feedback delivery and legal-action Bellman targets | P0 | Done | `tests/test_selfplay_feedback.py`, `tests/test_qtable_bootstrap.py`, and full pre-commit pass |
+| 7.2 | Correct Cop capture dominance and belief-state lifecycle semantics | P0 | Done | `tests/test_heuristic_capture.py`, `tests/test_belief_state.py`, and full pre-commit pass |
+| 7.3 | Align peer-match proposal, auth loading, forfeit tolerance, and sync detection with canonical submodule behavior | P0 | Done | `tests/test_run_peer_match.py`, `tests/test_peer_sync.py`, and full pre-commit pass |
+| 7.4 | Harden launcher adapter configuration, readiness cleanup, and exit-status propagation | P0 | Done | `tests/test_launch_common.py`, `tests/test_launch_lifecycle.py`, `tests/test_run_stack.py`, and full pre-commit pass |
+| 7.5 | Retrain invalidated Q-table artifacts with deterministic settings | P0 | Done | `models/qtable_manifest.json` and `docs/QTABLE_RETRAINING_REPORT.md` record command, seed, hashes, and metrics |
+| 7.6 | Synchronize remediation documentation and prompt log | P1 | Done | `docs/CODE_REVIEW_REMEDIATION.md`, `PLAN`, `PRD`, `INTERFACES`, `PROMPTS`, README sync, and checklist updated |
 
 **Note:** GitHub issue/milestone-management tooling (`bootstrap_github_repo.py`, `sync_milestones.py`, `check_github_metadata.py`, `check_phase_order.py`) from the source integration package was deliberately **not** ported — only local repo-state quality gates are exposed in this public-facing repo. `config/milestones.json` is kept as plain declarative data (used by `check_docs_present.py`'s required-files gate).
 

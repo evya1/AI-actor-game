@@ -38,6 +38,7 @@
 | 2.7 | Implement `load()` — read `.npy`, set ε=0 | P0 | Not Started | Loaded actor plays deterministically (ε=0) |
 | 4.1 | Belief state integration with RL backend | P2 | Not Started | QTableActor uses belief state when `opponent_pos` is `None` |
 | 4.3 | Learning curve visualization | P2 | Not Started | Graph of win rate vs. training episodes |
+| 7.1 | Correct RL, actor, peer, launcher, and model artifacts after Fable review | P0 | Done | See `docs/CODE_REVIEW_REMEDIATION.md` and `docs/QTABLE_RETRAINING_REPORT.md` |
 
 ---
 

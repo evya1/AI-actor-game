@@ -96,9 +96,10 @@ optional `role` kwarg, and `load()` tolerates a missing table (cold start).
 2. **The 5×5 game is cop-dominant.** With equal king-move speed and full
    visibility a competent pursuer always captures, so *any* thief wins ~0%.
    Honest results after 3000 training episodes:
-   - RL **cop beats the heuristic baseline** on capture speed (~3.97 vs ~4.80 rounds).
-   - RL thief underperforms the heuristic evader (all-loss outcomes give Q-learning
-     little gradient) — survival-time reward shaping is future work.
+   - Corrected Q-tables are retrained deterministically; see
+     `docs/QTABLE_RETRAINING_REPORT.md` for fixed-seed before/after metrics.
+   - RL thief remains sensitive to reward shaping, but the corrected artifact now
+     records materially better fixed-seed survival against the heuristic cop.
    - Series-level sub-game win rate (alternating roles) = **50%**, meeting the KPI.
 
 ---
@@ -174,7 +175,6 @@ with local + cross-team modes; Phase 6 quality-gate & CI infrastructure
 (11-hook pre-commit suite, keyless CI workflow — `docs/PLAN.md` §8).
 See `docs/TODO.md` for the live checklist.
 
-Future: survival-time reward shaping for the RL thief; belief-state integration
-once the submodule enables partial observability (`view_radius`); learning-curve
+Future: survival-time reward shaping for broader opponent mixes; learning-curve
 notebook; full end-to-end match recording for the report; enable CI's gated
 pytest job via the `SUBMODULE_SSH_KEY` repo secret (`docs/TODO.md` 6.4).

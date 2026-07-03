@@ -56,6 +56,9 @@ reimplement here.
 - [x] `uv run python scripts/validate_repo.py` → OK.
 - [x] `uv run python scripts/check_markdown_links.py` → OK.
 - [x] `uv run python scripts/readme_sync.py check` → OK.
+- [x] Correctness remediation evidence recorded in
+      `docs/CODE_REVIEW_REMEDIATION.md` and model retraining evidence in
+      `docs/QTABLE_RETRAINING_REPORT.md`.
 - [x] 11-hook pre-commit suite wired and installed (`.pre-commit-config.yaml`,
       `uv run pre-commit install`); verified firing on a real commit
       (PR [#3](https://github.com/evya1/AI-actor-game/pull/3)).

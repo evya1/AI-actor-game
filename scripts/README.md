@@ -14,6 +14,10 @@ executes inside the project's resolved environment.
 | `peer_sync.py`, `launch_common.py` | Launcher plumbing | yes |
 | `openrouter_adapter.py` | Ollama-compatible shim → OpenRouter | no |
 
+Model provenance for corrected Q-tables is recorded in
+`models/qtable_manifest.json`; before/after evaluation is in
+`docs/QTABLE_RETRAINING_REPORT.md`.
+
 ## Quality gates (wired into pre-commit + CI, no submodule needed)
 
 | Script | Origin | Purpose |

@@ -151,7 +151,10 @@ class BaseActor(ABC):
 | `N`, `NE`, `E`, `SE`, `S`, `SW`, `W`, `NW` | Move one cell | Both |
 | `BARRIER` | Place barrier on current cell | Cop only (max 5) |
 
-> **Note on visibility:** The view radius mechanism is not yet implemented in the submodule. Currently `opponent_pos` may always be visible. The belief-state tracker is designed for when partial observability is enabled.
+> **Note on visibility:** The pinned submodule now filters Cop observations by
+> `view_radius`; the Thief still sees the Cop. The belief-state tracker retains
+> the last visible position until a later sighting, explicit reset, or canonical
+> new-sub-game round regression.
 
 ### 3.2 FR-01: Actor Base (Cop + Thief)
 
