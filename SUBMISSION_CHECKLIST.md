@@ -51,10 +51,21 @@ reimplement here.
 
 ## Repo quality gates (this repo)
 
-- [ ] `uv run ruff check src tests scripts` → 0 violations.
-- [ ] `uv run pytest --cov=actor_t6 --cov-fail-under=85` → green (needs submodule).
-- [ ] `uv run python scripts/validate_repo.py` → OK.
-- [ ] `uv run python scripts/check_markdown_links.py` → OK.
-- [ ] `uv run python scripts/readme_sync.py check` → OK.
-- [ ] CI green on the submission commit.
-- [ ] AI-usage disclosure present (`docs/PROMPTS.md` / AI usage section).
+- [x] `uv run ruff check src tests scripts` → 0 violations.
+- [x] `uv run pytest --cov=actor_t6 --cov-fail-under=85` → green (needs submodule).
+- [x] `uv run python scripts/validate_repo.py` → OK.
+- [x] `uv run python scripts/check_markdown_links.py` → OK.
+- [x] `uv run python scripts/readme_sync.py check` → OK.
+- [x] 11-hook pre-commit suite wired and installed (`.pre-commit-config.yaml`,
+      `uv run pre-commit install`); verified firing on a real commit
+      (PR [#3](https://github.com/evya1/AI-actor-game/pull/3)).
+- [x] CI keyless gates green on `main` (ruff, line-cap, validate-repo,
+      no-secrets, docs-present, markdown-links, source-archives,
+      planning-IDs, workflow-permissions).
+- [ ] CI's gated pytest/coverage job green — blocked on the `SUBMODULE_SSH_KEY`
+      repo secret (needs a read-only deploy key on the submodule repo;
+      see `docs/TODO.md` task 6.4).
+- [ ] CI green on the submission commit (re-check at submission time).
+- [ ] AI-usage disclosure present (`docs/PROMPTS.md` / AI usage section) —
+      **`docs/PROMPTS.md` does not exist yet**; CLAUDE.md §6 requires a
+      prompt log — still to be created before submission.

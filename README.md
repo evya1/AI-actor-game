@@ -106,7 +106,7 @@ optional `role` kwarg, and `load()` tolerates a missing table (cold start).
 
 ```bash
 uv sync                                   # install deps (numpy, pytest, ruff)
-uv run pytest --cov=actor_t6              # 52 tests, 100% coverage on our modules
+uv run pytest --cov=actor_t6              # see repo-facts above for the live test count; 100% coverage on our modules
 uv run ruff check src tests scripts       # 0 violations
 uv run python scripts/train_qtable.py     # train → models/{cop,thief}_qtable.npy
 ```
@@ -166,11 +166,14 @@ Q-tables. Keep it that way: never place our files inside
 
 ## Status & future work
 
-Done: Phases 0–3 (config, heuristic, RL + offline trainer, integration), 52
-tests / 100% coverage / ruff-clean / all files ≤150 lines; OpenRouter adapter;
-full-stack launcher (`run_stack.py`) with local + cross-team modes.
+Done: Phases 0–3 (config, heuristic, RL + offline trainer, integration; see
+repo-facts above for the live test count) — 100% coverage / ruff-clean / all
+files ≤150 lines; OpenRouter adapter; full-stack launcher (`run_stack.py`)
+with local + cross-team modes; Phase 6 quality-gate & CI infrastructure
+(11-hook pre-commit suite, keyless CI workflow — `docs/PLAN.md` §8).
 See `docs/TODO.md` for the live checklist.
 
 Future: survival-time reward shaping for the RL thief; belief-state integration
 once the submodule enables partial observability (`view_radius`); learning-curve
-notebook; full end-to-end match recording for the report.
+notebook; full end-to-end match recording for the report; enable CI's gated
+pytest job via the `SUBMODULE_SSH_KEY` repo secret (`docs/TODO.md` 6.4).

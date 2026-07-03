@@ -1,6 +1,9 @@
 # Product Requirements Document (PRD) — Cop & Thief Actors
 
-## Version 1.1 | 2026-06-25
+## Version 1.2 | 2026-07-03
+
+> **Change from v1.1:** §4.3 references the new mechanical quality-gate
+> enforcement (`docs/PLAN.md` §8).
 
 ---
 
@@ -241,6 +244,7 @@ class BaseActor(ABC):
 | Docstrings | Every public method and class |
 | DRY | Shared belief-state and state-encoding utilities |
 | Single responsibility | One file per backend, one file per utility |
+| Mechanical enforcement | 11-hook pre-commit suite + keyless CI workflow — see [`docs/PLAN.md`](PLAN.md) §8 |
 
 ---
 
@@ -390,5 +394,5 @@ A game consists of **6 sub-games**. Maximum combined score: **90**. Minimum: **3
 
 ---
 
-*Document Version: 1.1*
-*Last Updated: 2026-06-25*
+*Document Version: 1.2*
+*Last Updated: 2026-07-03*
