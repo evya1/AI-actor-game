@@ -1,6 +1,8 @@
 # Architecture & Planning — Cop & Thief Actors
 
-## Version 1.0 | 2026-06-25
+## Version 1.1 | 2026-07-03
+
+> **Change from v1.0:** Added §8 Quality Gates & CI Tooling.
 
 ---
 
@@ -532,5 +534,53 @@ C4Deployment
 
 ---
 
-*Document Version: 1.0*
-*Last Updated: 2026-06-25*
+## 8. Quality Gates & CI Tooling
+
+Repo-level tooling — outside the actor module contract (§3), so exempt from
+the Interface Change Protocol — that enforces this document's own rules
+(150-line limit, zero-ruff, ≥85% coverage) mechanically instead of by
+convention.
+
+### 8.1 Layers
+
+1. **Local gate scripts** (`scripts/check_*.py`, `scripts/validate_repo.py`,
+   `scripts/readme_sync.py`) — each a standalone, single-purpose check over
+   repo state: line caps, docs presence, secret scanning, markdown-link
+   resolution, tracked-archive allowlisting, unique `docs/TODO.md` task IDs,
+   minimal workflow `permissions:`, and a generated `repo-facts` region in
+   `README.md`. See `scripts/README.md` for the full list and provenance.
+2. **`.pre-commit-config.yaml`** — wires all 9 scripts plus `ruff check` and
+   `pytest --cov=actor_t6 --cov-fail-under=85` into 11 local hooks. Installed
+   once per clone via `uv run pre-commit install`; from then on every
+   `git commit` runs the full suite.
+3. **`.github/workflows/ci.yml`** — mirrors the same checks in two layers:
+   *keyless gates* (no secrets, no submodule needed — ruff, line-cap,
+   validate-repo, no-secrets, docs-present, markdown-links, source-archives,
+   planning-IDs, workflow-permissions) run on every push/PR; the *test suite*
+   (pytest + coverage + README fact-check) additionally needs the private
+   submodule, gated on the `SUBMODULE_SSH_KEY` repo secret — skipped, not
+   failed, when absent.
+
+### 8.2 ADR-005: Exclude GitHub issue/milestone-management tooling
+
+The source integration package also included `gh`-authenticated scripts that
+mutate live GitHub state (`bootstrap_github_repo.py`, `sync_milestones.py`,
+`check_github_metadata.py`, `check_phase_order.py`). These were deliberately
+**not** ported into this public-facing repo — only scripts that check local
+repo state (no network, no write access to GitHub) are exposed. `config/
+milestones.json` is kept as inert declarative data (satisfies the
+docs-presence gate; not read by anything in this repo without the removed
+scripts).
+
+### 8.3 Status
+
+Applied via PR [#2](https://github.com/evya1/AI-actor-game/pull/2) (scripts,
+docs, CI, pre-commit) and PR [#3](https://github.com/evya1/AI-actor-game/pull/3)
+(dropped a duplicated tracked archive). See `docs/TODO.md` Phase 6 for the
+task-level breakdown; `6.4` (the `SUBMODULE_SSH_KEY` secret) is the one open
+item.
+
+---
+
+*Document Version: 1.1*
+*Last Updated: 2026-07-03*

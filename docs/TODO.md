@@ -1,7 +1,9 @@
 # Task Tracking — Cop & Thief Actors
 
-## Version 2.1 | 2026-06-25
+## Version 2.2 | 2026-07-03
 
+> **Change from v2.1:** Added Phase 6 (quality-gate & CI infrastructure), tracked in PRs [#2](https://github.com/evya1/AI-actor-game/pull/2) and [#3](https://github.com/evya1/AI-actor-game/pull/3).
+>
 > **Change from v1.0:** Tests distributed across phases. Each phase ends with unit tests for its modules, so nothing is tested all at once. Original grouped version preserved in [TODO_ORIGINAL.md](TODO_ORIGINAL.md).
 
 ## Implementation Status (v2.1)
@@ -11,6 +13,7 @@
 - ✅ **Phase 2 — RL:** `state_encoder.py` (relative encoding, ADR-002), `qtable_actor.py` (ε-greedy + Bellman + decay + save/load), `scripts/train_qtable.py` + `scripts/selfplay.py` (offline training harness). Trained tables saved to `models/`.
 - 🚧 **Phase 3 — Integration/QA:** ruff = 0 violations; coverage = 100% (≥85% gate); all files ≤150 lines; integration Steps 1–5 verified offline (engine + submodule `actor_loader`). **Remaining:** full `run_match.py --mode actor` smoke needs an LLM for NL messages — choose a backend per [`docs/LLM_BACKENDS.md`](LLM_BACKENDS.md) (Ollama, or OpenRouter via `scripts/openrouter_adapter.py`).
 - ✅ **Phase 5 — Launcher tooling:** `scripts/run_stack.py` (one-command `local` + `cross-team`), `run_peer_match.py` (cross-team half-orchestrator), `launch_common.py`, `peer_sync.py`. Documents why the bare MCP server makes no LLM calls (Gatekeeper lives in the client). 31 new unit tests; ruff-clean; all files ≤150 lines. See [`docs/INTERFACES.md`](INTERFACES.md) §4.
+- ✅ **Phase 6 — Quality-gate & CI infrastructure:** 9 local quality-gate scripts (ruff, line-cap, secret-scan, docs-presence, markdown-links, source-archives, planning-IDs, workflow-permissions, README fact-sync), wired into an 11-hook pre-commit suite and a keyless GitHub Actions workflow. PR templates and `SUBMISSION_CHECKLIST.md` added. See [`docs/PLAN.md`](PLAN.md) §8. **Remaining:** `SUBMODULE_SSH_KEY` repo secret not yet set (needs a read-only deploy key on the submodule repo), so CI's pytest/coverage job stays skipped — keyless gates still protect the branch.
 
 **Key implementation findings** (see also docs/PLAN.md §4, §6.1):
 - Q-learning trains **offline** — the submodule match path loads a fresh actor each turn and never calls `on_result`.
@@ -95,6 +98,19 @@
 
 ---
 
+## Phase 6: Quality-Gate & CI Infrastructure
+
+| # | Task | Priority | Status | DoD |
+|---|------|----------|--------|-----|
+| 6.1 | Port 9 local quality-gate scripts into `scripts/` (ruff wrapper N/A — direct `ruff check`; line-cap, secret-scan, docs-presence, markdown-links, source-archives, planning-IDs, workflow-permissions, README fact-sync) | P1 | Done | All 9 scripts pass on `main`; see `scripts/README.md`. PR [#2](https://github.com/evya1/AI-actor-game/pull/2) |
+| 6.2 | Wire `.pre-commit-config.yaml` (11 hooks) + install locally | P1 | Done | `uv run pre-commit install` run; hooks fire on commit (verified live in PR [#3](https://github.com/evya1/AI-actor-game/pull/3)) |
+| 6.3 | Add keyless CI workflow (`.github/workflows/ci.yml`), PR/issue templates, `SUBMISSION_CHECKLIST.md` | P1 | Done | Workflow green on `main`; minimal `permissions: contents: read` |
+| 6.4 | Enable CI's gated pytest/coverage job via `SUBMODULE_SSH_KEY` repo secret | P2 | Not Started | Requires a read-only deploy key on `AmitKuper/agent-orchestration-course-t6-common`, added as a repo secret on `AI-actor-game`; blocked on submodule-repo admin access |
+
+**Note:** GitHub issue/milestone-management tooling (`bootstrap_github_repo.py`, `sync_milestones.py`, `check_github_metadata.py`, `check_phase_order.py`) from the source integration package was deliberately **not** ported — only local repo-state quality gates are exposed in this public-facing repo. `config/milestones.json` is kept as plain declarative data (used by `check_docs_present.py`'s required-files gate).
+
+---
+
 ## Legend
 
 | Symbol | Meaning |
@@ -114,5 +130,5 @@ A task is **Done** when:
 
 ---
 
-*Document Version: 2.0*
-*Last Updated: 2026-06-25*
+*Document Version: 2.2*
+*Last Updated: 2026-07-03*
