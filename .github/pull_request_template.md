@@ -23,7 +23,7 @@ with `N/A` and a one-line reason. Do not delete checklist sections.
 ## Gates
 
 - [ ] `uv run ruff check src tests scripts` — passing
-- [ ] `uv run pytest --cov=actor_t6 --cov-fail-under=85` — passing (needs submodule)
+- [ ] `uv run pytest --cov=actor_brains --cov-fail-under=85` — passing (needs submodule)
 - [ ] `uv run python scripts/check_line_cap.py src scripts tests --limit 150` — passing
 - [ ] `uv run python scripts/validate_repo.py` — passing
 - [ ] `uv run python scripts/check_no_secrets.py` — passing

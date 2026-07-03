@@ -1,6 +1,6 @@
 """Pure scoring helpers for the heuristic actor.
 
-Extracted from :mod:`actor_t6.heuristic_actor` to keep each file within the
+Extracted from :mod:`actor_brains.heuristic_actor` to keep each file within the
 150-line limit and to make the scoring logic independently testable. All
 functions are stateless and operate on plain tuples, so they carry no game
 state of their own.

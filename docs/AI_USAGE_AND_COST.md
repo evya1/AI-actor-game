@@ -123,7 +123,7 @@ billing, apply the Cost Calculation Template below to these token counts.
 Unlike the plan-metered agent sessions above, the local smoke test's LLM calls
 went through **OpenRouter** and carry real per-generation cost. Figures below
 are computed directly from the OpenRouter generation export
-(`app_name = "Cop & Thief actor_t6"`, model `deepseek/deepseek-v3.2`,
+(`app_name = "Cop & Thief actor_brains"`, model `deepseek/deepseek-v3.2`,
 2026-07-03), covering both smoke runs that day.
 
 | Metric | Value |

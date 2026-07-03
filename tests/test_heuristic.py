@@ -1,9 +1,9 @@
-"""Unit tests for actor_t6.heuristic_actor and heuristic_scoring (Phase 1)."""
+"""Unit tests for actor_brains.heuristic_actor and heuristic_scoring (Phase 1)."""
 
 from __future__ import annotations
 
-from actor_t6 import heuristic_scoring as scoring
-from actor_t6.heuristic_actor import HeuristicActor
+from actor_brains import heuristic_scoring as scoring
+from actor_brains.heuristic_actor import HeuristicActor
 from tests.conftest import make_obs, make_result
 
 # --- scoring helpers -------------------------------------------------------

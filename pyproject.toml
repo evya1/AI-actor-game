@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "actor-for-ex06"
 version = "1.0.1"
-description = "Cop & Thief actor decision backends (actor_t6) for HW6"
+description = "Cop & Thief actor decision backends (actor_brains) for HW6"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -13,7 +13,7 @@ dependencies = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/actor_t6"]
+packages = ["src/actor_brains"]
 
 [tool.ruff]
 line-length = 100
@@ -39,7 +39,7 @@ pythonpath = ["src", "agent-orchestration-course-t6-common/src"]
 filterwarnings = ["ignore::DeprecationWarning"]
 
 [tool.coverage.run]
-source = ["src/actor_t6"]
+source = ["src/actor_brains"]
 
 [tool.coverage.report]
 fail_under = 85

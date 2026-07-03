@@ -5,7 +5,7 @@ observability logic lives in exactly one place. It keeps a single point
     estimate of the opponent's cell: refreshed whenever ``opponent_pos`` is visible
     and cleared when the canonical round counter regresses to a new sub-game.
 
-Leaf module — depends on nothing inside actor_t6.
+Leaf module — depends on nothing inside actor_brains.
 """
 
 from __future__ import annotations

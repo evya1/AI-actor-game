@@ -92,7 +92,7 @@ qtable_actor  ──→ state_encoder  ──→ (nothing)
 - **Command Style**: Always use `uv run <command>` and maintain `pyproject.toml` and `uv.lock`.
 
 ### Version Control (See skill: `version-control`)
-- **Global Versioning**: Start at `1.00` in `src/actor_t6/shared/version.py` and config files.
+- **Global Versioning**: Start at `1.00` in `src/actor_brains/shared/version.py` and config files.
 - **Prompt Log**: Maintain a log of prompts used, context provided, and improvements made.
 - **Git**: Meaningful commit messages, feature branches, and PR-based reviews.
 

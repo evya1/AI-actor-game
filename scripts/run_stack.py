@@ -25,12 +25,17 @@ import subprocess
 
 import launch_common
 
+# The submodule's run_match.py hard-codes a stale --actor-class default, so we
+# always pass our own package's dotted path (both launch modes) rather than
+# relying on that default.
+DEFAULT_ACTOR_CLASS = "actor_brains.qtable_actor.QTableActor"
+
 
 def _server_env(opponent_url: str, my_role: str, actor_class: str) -> dict:
     """Build the env for the local MCP server subprocess (cross-team mode).
 
     Mirrors run_match.py's actor-mode env: opponent URL, MCP auth keys, and the
-    actor backend (with main ``src`` on PYTHONPATH so actor_t6 is importable).
+    actor backend (with main ``src`` on PYTHONPATH so actor_brains is importable).
 
     Args:
         opponent_url: Base URL of the remote partner's server.
@@ -61,6 +66,8 @@ def run_local(extra: list[str], cfg: dict, needs_adapter: bool) -> int:
     adapter = launch_common.start_adapter(cfg) if needs_adapter else None
     try:
         script = launch_common.SUBMODULE_ROOT / "scripts" / "run_match.py"
+        if not any(a == "--actor-class" or a.startswith("--actor-class=") for a in extra):
+            extra = [*extra, "--actor-class", DEFAULT_ACTOR_CLASS]
         result = subprocess.run(launch_common.submodule_cmd(["python", str(script), *extra]),
                                 cwd=str(launch_common.REPO_ROOT), check=False)
         return int(result.returncode)
@@ -112,7 +119,7 @@ def _build_parser(cfg: dict) -> argparse.ArgumentParser:
     ct.add_argument("--seed", type=int, required=True)
     ct.add_argument("--port", type=int, default=cfg["default_server_port"])
     ct.add_argument("--games-dir", default=cfg["default_games_dir"])
-    ct.add_argument("--actor-class", default="actor_t6.qtable_actor.QTableActor")
+    ct.add_argument("--actor-class", default=DEFAULT_ACTOR_CLASS)
     ct.add_argument("--max-rounds", type=int, default=30)
     ct.add_argument("--turn-timeout", type=float, default=30.0)
     return parser

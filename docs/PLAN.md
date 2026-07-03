@@ -21,7 +21,7 @@ C4Context
     System(submodule, "agent-orchestration-course-t6-common", "Game engine, MCP servers, LLM wrapper, match orchestrator")
     System_Ext(llm, "LLM Provider", "Ollama or Anthropic — generates NL messages")
 
-    Boundary(our_scope, "Our Scope (actor_t6)") {
+    Boundary(our_scope, "Our Scope (actor_brains)") {
         System(actors, "Actor Backends", "HeuristicActor, QTableActor — decide each move")
     }
 
@@ -41,7 +41,7 @@ C4Container
     Container(server_b, "MCP Server B :8002", "Python/FastMCP", "Cop server (submodule)")
     Container(llm_svc, "LLM Service", "Ollama / Anthropic", "NL message generation")
 
-    Boundary(our_code, "actor_t6 (our package)") {
+    Boundary(our_code, "actor_brains (our package)") {
         Container(heuristic, "HeuristicActor", "Python", "Rule-based decision backend")
         Container(qtable, "QTableActor", "Python", "Q-learning decision backend")
         Container(encoder, "StateEncoder", "Python", "Game state → Q-table index")
@@ -60,9 +60,9 @@ C4Container
 
 ```mermaid
 C4Component
-    title C4 Component — actor_t6 Package
+    title C4 Component — actor_brains Package
 
-    Boundary(actor_t6, "actor_t6") {
+    Boundary(actor_brains, "actor_brains") {
         Component(heuristic_actor, "HeuristicActor", "BaseActor subclass", "Weighted scoring over legal moves")
         Component(qtable_actor, "QTableActor", "BaseActor subclass", "Epsilon-greedy Q-learning policy")
         Component(state_encoder, "StateEncoder", "Utility", "Relative position + barriers → state index")
@@ -302,7 +302,7 @@ Five steps, each verified before moving to the next. Each step uses the submodul
 ```bash
 cd agent-orchestration-course-t6-common
 PYTHONPATH=../src uv run python -c "
-from actor_t6.heuristic_actor import HeuristicActor
+from actor_brains.heuristic_actor import HeuristicActor
 a = HeuristicActor()
 print('OK:', a)
 "
@@ -320,7 +320,7 @@ print('OK:', a)
 cd agent-orchestration-course-t6-common
 uv run python scripts/run_match.py \
     --mode actor \
-    --actor-class actor_t6.heuristic_actor.HeuristicActor \
+    --actor-class actor_brains.heuristic_actor.HeuristicActor \
     --seed 42
 ```
 
@@ -355,7 +355,7 @@ Same command as Step 2 with default 5×5 grid and `max_moves: 25` from submodule
 ```bash
 uv run python scripts/run_match.py \
     --mode actor \
-    --actor-class actor_t6.qtable_actor.QTableActor \
+    --actor-class actor_brains.qtable_actor.QTableActor \
     --seed 42
 ```
 
@@ -370,7 +370,7 @@ uv run python scripts/run_match.py \
 ```bash
 uv run python scripts/run_match.py \
     --mode actor \
-    --actor-class actor_t6.qtable_actor.QTableActor \
+    --actor-class actor_brains.qtable_actor.QTableActor \
     --models-dir models \
     --seed 42
 ```
@@ -525,7 +525,7 @@ The three reward-shaping keys (`win_reward`, `lose_reward`, `step_cost`) define
 the offline training signal: a terminal win/loss reward plus a per-step cost
 (negative for the cop to reward fast capture, positive for the thief to reward
 survival). They were added during Phase 2 implementation; defaults also live in
-`actor_t6.config.DEFAULTS`.
+`actor_brains.config.DEFAULTS`.
 
 ### 6.2 Q-Table Format
 
@@ -582,7 +582,7 @@ convention.
    minimal workflow `permissions:`, and a generated `repo-facts` region in
    `README.md`. See `scripts/README.md` for the full list and provenance.
 2. **`.pre-commit-config.yaml`** — wires all 9 scripts plus `ruff check` and
-   `pytest --cov=actor_t6 --cov-fail-under=85` into 11 local hooks. Installed
+   `pytest --cov=actor_brains --cov-fail-under=85` into 11 local hooks. Installed
    once per clone via `uv run pre-commit install`; from then on every
    `git commit` runs the full suite.
 3. **`.github/workflows/ci.yml`** — mirrors the same checks in two layers:

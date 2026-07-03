@@ -1,8 +1,8 @@
-"""Unit tests for actor_t6.belief_state (Phase 1)."""
+"""Unit tests for actor_brains.belief_state (Phase 1)."""
 
 from __future__ import annotations
 
-from actor_t6.belief_state import BeliefState
+from actor_brains.belief_state import BeliefState
 from tests.conftest import make_obs
 
 

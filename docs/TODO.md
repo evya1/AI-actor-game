@@ -13,7 +13,7 @@
 
 ## Implementation Status (v2.1)
 
-- ✅ **Phase 0 — Setup:** `actor_t6` package, `config/actor_config.json`, `config.py` (defaults + schema validation), `shared/version.py` (1.00), `pyproject.toml` (numpy, ruff, pytest). Tests pass.
+- ✅ **Phase 0 — Setup:** `actor_brains` package, `config/actor_config.json`, `config.py` (defaults + schema validation), `shared/version.py` (1.00), `pyproject.toml` (numpy, ruff, pytest). Tests pass.
 - ✅ **Phase 1 — Heuristic:** `belief_state.py`, `heuristic_actor.py` (+ `heuristic_scoring.py` extracted for the 150-line limit), role-aware Cop/Thief scoring, save/load tolerant of a missing file. Unit + integration tests pass on the real engine.
 - ✅ **Phase 2 — RL:** `state_encoder.py` (relative encoding, ADR-002), `qtable_actor.py` (ε-greedy + Bellman + decay + save/load), `scripts/train_qtable.py` + `scripts/selfplay.py` (offline training harness). Trained tables saved to `models/`.
 - 🚧 **Phase 3 — Integration/QA:** ruff = 0 violations; coverage = 100% (≥85% gate); all files ≤150 lines; integration Steps 1–5 verified offline (engine + submodule `actor_loader`). **Remaining:** full `run_match.py --mode actor` smoke needs an LLM for NL messages — choose a backend per [`docs/LLM_BACKENDS.md`](LLM_BACKENDS.md) (Ollama, or OpenRouter via `scripts/openrouter_adapter.py`).
@@ -31,7 +31,7 @@
 
 | # | Task | Priority | Status | DoD |
 |---|------|----------|--------|-----|
-| 0.1 | Create `src/actor_t6/` package with `__init__.py` | P0 | Not Started | Package importable via `PYTHONPATH=../src` (see [PLAN §3 Modules](docs/PLAN.md#3-independent-modules)) |
+| 0.1 | Create `src/actor_brains/` package with `__init__.py` | P0 | Not Started | Package importable via `PYTHONPATH=../src` (see [PLAN §3 Modules](docs/PLAN.md#3-independent-modules)) |
 | 0.2 | Create `config/actor_config.json` with default weights | P0 | Not Started | JSON validates, all required keys present |
 | 0.3 | Create `config.py` — config loader with schema validation | P0 | Not Started | Returns defaults for missing keys, raises on invalid types (see [PLAN §6.1 Config Schema](docs/PLAN.md#61-actor-config-configactor_configjson)) |
 | 0.4 | Unit tests for `config` | P1 | Not Started | Test with invalid/missing keys, verify defaults (see [PLAN §3 Unit Test Strategy](docs/PLAN.md#3-independent-modules)) |
@@ -86,7 +86,7 @@
 | 3.4 | Integration Step 4 — QTableActor cold start | P0 | Not Started | Game completes, `.npy` files created (see [PLAN §4 Step 4](docs/PLAN.md#step-4--qtableactor-cold-start-no-training)) |
 | 3.5 | Integration Step 5 — QTableActor trained vs heuristic | P1 | Not Started | RL actor wins ≥ 50% of sub-games (see [PLAN §4 Step 5](docs/PLAN.md#step-5--qtableactor-trained-exploitation-mode)) |
 | 3.6 | Ruff lint — zero violations | P0 | Not Started | `ruff check src/` passes |
-| 3.7 | Full test suite — ≥ 85% coverage | P0 | Not Started | `pytest --cov=actor_t6` passes threshold |
+| 3.7 | Full test suite — ≥ 85% coverage | P0 | Not Started | `pytest --cov=actor_brains` passes threshold |
 
 **Milestone:** All 5 integration steps pass. Ready for submission.
 

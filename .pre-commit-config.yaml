@@ -18,7 +18,7 @@ repos:
 
       - id: pytest
         name: pytest with coverage (>=85%)
-        entry: uv run pytest --cov=actor_t6 --cov-fail-under=85 -q
+        entry: uv run pytest --cov=actor_brains --cov-fail-under=85 -q
         language: system
         pass_filenames: false
 

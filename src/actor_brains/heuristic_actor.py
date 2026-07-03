@@ -2,9 +2,9 @@
 
 A single :class:`~actor.base_actor.BaseActor` subclass that plays both roles
 (ADR-001). Each turn it scores every legal move with a weighted heuristic
-(:mod:`actor_t6.heuristic_scoring`) and returns the best one — fast,
+(:mod:`actor_brains.heuristic_scoring`) and returns the best one — fast,
 deterministic, and dependency-free of any learning state. It composes a
-:class:`~actor_t6.belief_state.BeliefState` to cope with a hidden opponent.
+:class:`~actor_brains.belief_state.BeliefState` to cope with a hidden opponent.
 
 Depends only on ``belief_state`` and ``config`` (never on ``qtable_actor``).
 """
@@ -18,9 +18,9 @@ from typing import TYPE_CHECKING
 from actor.base_actor import BaseActor
 from game.constants import COP, DEFAULT_GRID_SIZE, THIEF
 
-from actor_t6 import heuristic_scoring as scoring
-from actor_t6.belief_state import BeliefState
-from actor_t6.config import load_config
+from actor_brains import heuristic_scoring as scoring
+from actor_brains.belief_state import BeliefState
+from actor_brains.config import load_config
 
 if TYPE_CHECKING:
     from game.state import ActionResult, ObservationState

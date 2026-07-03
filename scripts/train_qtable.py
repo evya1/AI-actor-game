@@ -23,8 +23,8 @@ for _p in (_REPO_ROOT / "src", _REPO_ROOT / "agent-orchestration-course-t6-commo
 
 from selfplay import derive_positions, play_game  # noqa: E402
 
-from actor_t6.heuristic_actor import HeuristicActor  # noqa: E402
-from actor_t6.qtable_actor import QTableActor  # noqa: E402
+from actor_brains.heuristic_actor import HeuristicActor  # noqa: E402
+from actor_brains.qtable_actor import QTableActor  # noqa: E402
 
 
 def train(episodes: int, seed: int, grid: tuple[int, int]) -> dict[str, QTableActor]:

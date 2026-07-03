@@ -26,7 +26,7 @@ def test_server_env_thief_table_and_keys(monkeypatch):
     monkeypatch.delenv("PYTHONPATH", raising=False)
     monkeypatch.setenv("MCP_API_KEY", "mine")
     monkeypatch.setenv("MCP_ALLOWED_API_KEYS", "theirs")
-    env = rs._server_env("http://remote:9", "thief", "actor_t6.qtable_actor.QTableActor")
+    env = rs._server_env("http://remote:9", "thief", "actor_brains.qtable_actor.QTableActor")
     assert env["OPPONENT_MCP_URL"] == "http://remote:9"
     assert env["ACTOR_TABLE"].endswith("thief_qtable.npy")
     assert "mine" in env["MCP_ALLOWED_API_KEYS"] and "theirs" in env["MCP_ALLOWED_API_KEYS"]
@@ -35,7 +35,7 @@ def test_server_env_thief_table_and_keys(monkeypatch):
 
 def test_server_env_cop_table(monkeypatch):
     monkeypatch.setenv("MCP_API_KEY", "k")
-    env = rs._server_env("http://remote:9", "cop", "actor_t6.qtable_actor.QTableActor")
+    env = rs._server_env("http://remote:9", "cop", "actor_brains.qtable_actor.QTableActor")
     assert env["ACTOR_TABLE"].endswith("cop_qtable.npy")
     assert os.pathsep not in env["PYTHONPATH"] or env["PYTHONPATH"]  # well-formed
 

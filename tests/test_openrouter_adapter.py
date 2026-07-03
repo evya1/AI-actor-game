@@ -1,6 +1,6 @@
 """Tests for the OpenRouter adapter's request/response translation.
 
-The adapter is tooling (not part of the actor_t6 package), but the protocol
+The adapter is tooling (not part of the actor_brains package), but the protocol
 translation is the one piece worth pinning down, so a match never breaks on a
 malformed bridge. No network or API key is used — urlopen is monkeypatched.
 """

@@ -46,14 +46,14 @@ The submodule provides the following out of the box:
 | **Belief state tracker** | Estimates opponent position when `opponent_pos` is `None` |
 | **Config loader** | Loads actor hyperparameters from config files |
 
-We package our actors under `actor_t6` so the submodule server can load them via `ACTOR_CLASS=actor_t6.<module>.<Class>`. The server handles instantiation — we do not implement a factory.
+We package our actors under `actor_brains` so the submodule server can load them via `ACTOR_CLASS=actor_brains.<module>.<Class>`. The server handles instantiation — we do not implement a factory.
 
 ### 1.4 Integration Model
 
 Per the submodule README (§"Wiring Your Actor into the Server"), the server loads our actor through environment variables — **no code changes to the submodule**:
 
 ```
-ACTOR_CLASS=actor_t6.qtable_actor.QTableActor
+ACTOR_CLASS=actor_brains.qtable_actor.QTableActor
 ACTOR_TABLE=models/cop_qtable.npy
 ```
 
@@ -63,7 +63,7 @@ The server:
 3. Wraps our actor with `LLMMessageWrapper` (LLM generates NL messages)
 4. Calls `get_action(obs)` each turn and `on_result(...)` after resolution
 
-We make our package importable by placing it under `src/actor_t6/` and setting `PYTHONPATH` (or using `run_match.py --mode actor` which does this automatically).
+We make our package importable by placing it under `src/actor_brains/` and setting `PYTHONPATH` (or using `run_match.py --mode actor` which does this automatically).
 
 ### 1.5 Out of Scope
 
@@ -263,7 +263,7 @@ class BaseActor(ABC):
 **As a** developer, **I want to** run both Cop and Thief with the heuristic backend, **so that** I have a fast, deterministic baseline.
 
 **Acceptance Criteria:**
-- `ACTOR_CLASS=actor_t6.heuristic_actor.HeuristicActor`
+- `ACTOR_CLASS=actor_brains.heuristic_actor.HeuristicActor`
 - Cop pursues using distance minimization + barrier strategy
 - Thief evades using distance maximization + trap avoidance
 - No training or LLM calls required
@@ -272,7 +272,7 @@ class BaseActor(ABC):
 **As a** developer, **I want to** train a Q-learning actor over many games, **so that** it learns a better policy than the heuristic baseline.
 
 **Acceptance Criteria:**
-- `ACTOR_CLASS=actor_t6.qtable_actor.QTableActor`
+- `ACTOR_CLASS=actor_brains.qtable_actor.QTableActor`
 - Q-table updates via `on_result()` using Bellman equation
 - Epsilon-greedy policy with configurable decay
 - Q-table saved to `models/cop_qtable.npy` and `models/thief_qtable.npy`
@@ -314,7 +314,7 @@ class BaseActor(ABC):
 | Max 150 lines/file | Split logic when files grow |
 | Python 3.12+ | Minimum runtime version |
 | Config-driven | No hard-coded hyperparameters |
-| Package name `actor_t6` | Required by submodule's `run_match.py` convention |
+| Package name `actor_brains` | Required by submodule's `run_match.py` convention |
 
 ---
 
@@ -335,7 +335,7 @@ class BaseActor(ABC):
 ```
 actor-for-ex06/
 ├── src/
-│   └── actor_t6/
+│   └── actor_brains/
 │       ├── __init__.py
 │       ├── heuristic_actor.py   # HeuristicActor(BaseActor)
 │       ├── qtable_actor.py      # QTableActor(BaseActor)

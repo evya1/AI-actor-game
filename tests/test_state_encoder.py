@@ -1,10 +1,10 @@
-"""Unit tests for actor_t6.state_encoder (Phase 2)."""
+"""Unit tests for actor_brains.state_encoder (Phase 2)."""
 
 from __future__ import annotations
 
 import itertools
 
-from actor_t6.state_encoder import StateEncoder
+from actor_brains.state_encoder import StateEncoder
 from tests.conftest import make_obs
 
 GRID = (5, 5)

@@ -61,7 +61,7 @@ def _forward_to_openrouter(payload: dict) -> dict:
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
             "HTTP-Referer": "https://github.com/evya1/AI-actor-game",
-            "X-Title": "Cop & Thief actor_t6",
+            "X-Title": "Cop & Thief actor_brains",
         },
     )
     with urllib.request.urlopen(request, timeout=_TIMEOUT) as resp:  # noqa: S310

@@ -12,7 +12,7 @@
 
 | # | Task | Priority | Status | DoD |
 |---|------|----------|--------|-----|
-| 0.1 | Create `src/actor_t6/` package with `__init__.py` | P0 | Not Started | Package importable via `PYTHONPATH=../src` (see [PLAN §3 Modules](PLAN.md#3-independent-modules)) |
+| 0.1 | Create `src/actor_brains/` package with `__init__.py` | P0 | Not Started | Package importable via `PYTHONPATH=../src` (see [PLAN §3 Modules](PLAN.md#3-independent-modules)) |
 | 0.2 | Create `config/actor_config.json` with default weights | P0 | Not Started | JSON validates, all required keys present |
 | 3.6 | Ruff lint — zero violations | P0 | Not Started | `ruff check src/` passes |
 | 4.4 | README.md — scientific report | P1 | Not Started | DecPOMDP formalization, orchestration analysis, screenshots |
@@ -56,7 +56,7 @@
 | 3.3 | Integration Step 3 — heuristic on 5×5 (6 sub-games) | P0 | Not Started | Total score > 30 (see [PLAN §4 Step 3](PLAN.md#step-3--heuristic-on-55-full-game)) |
 | 3.4 | Integration Step 4 — QTableActor cold start | P0 | Not Started | Game completes, `.npy` files created (see [PLAN §4 Step 4](PLAN.md#step-4--qtableactor-cold-start-no-training)) |
 | 3.5 | Integration Step 5 — QTableActor trained vs heuristic | P1 | Not Started | RL actor wins ≥ 50% of sub-games (see [PLAN §4 Step 5](PLAN.md#step-5--qtableactor-trained-exploitation-mode)) |
-| 3.7 | Full test suite — ≥ 85% coverage | P0 | Not Started | `pytest --cov=actor_t6` passes threshold |
+| 3.7 | Full test suite — ≥ 85% coverage | P0 | Not Started | `pytest --cov=actor_brains` passes threshold |
 | 4.2 | Simulated partial observability tests | P2 | Not Started | Tests with artificially hidden `opponent_pos` pass |
 
 ---

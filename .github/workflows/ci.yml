@@ -95,7 +95,7 @@ jobs:
 
       - name: Tests with coverage gate
         if: steps.key.outputs.have == 'true'
-        run: uv run pytest --cov=actor_t6 --cov-report=term-missing --cov-fail-under=85
+        run: uv run pytest --cov=actor_brains --cov-report=term-missing --cov-fail-under=85
 
       - name: README generated facts sync
         if: steps.key.outputs.have == 'true'

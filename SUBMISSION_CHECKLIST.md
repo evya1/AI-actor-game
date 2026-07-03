@@ -59,7 +59,7 @@ reimplement here.
       `git rev-list -n 1 hw6-bonus-submission-v1`. This tag preserves Git
       state; it is not evidence that delivery email was sent.
 - [x] `uv run ruff check src tests scripts` → 0 violations.
-- [x] `uv run pytest --cov=actor_t6 --cov-fail-under=85` → green (needs submodule).
+- [x] `uv run pytest --cov=actor_brains --cov-fail-under=85` → green (needs submodule).
 - [x] `uv run python scripts/validate_repo.py` → OK.
 - [x] `uv run python scripts/check_markdown_links.py` → OK.
 - [x] `uv run python scripts/readme_sync.py check` → OK.

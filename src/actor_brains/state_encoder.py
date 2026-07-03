@@ -6,7 +6,7 @@ invariance and shrinks the table from hundreds of position pairs to ~81 offsets.
 Two cheap context features are appended — a near-edge flag and a bucketed count
 of nearby barriers — and a single reserved index represents an unseen opponent.
 
-Leaf module — depends on nothing inside actor_t6.
+Leaf module — depends on nothing inside actor_brains.
 """
 
 from __future__ import annotations

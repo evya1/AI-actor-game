@@ -18,8 +18,8 @@ import numpy as np
 from actor.base_actor import BaseActor
 from game.constants import BARRIER_ACTION, COP, DEFAULT_GRID_SIZE, DIRECTIONS, STAY_ACTION
 
-from actor_t6.config import load_config
-from actor_t6.state_encoder import StateEncoder
+from actor_brains.config import load_config
+from actor_brains.state_encoder import StateEncoder
 
 if TYPE_CHECKING:
     from game.state import ActionResult, ObservationState

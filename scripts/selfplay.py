@@ -7,7 +7,7 @@ fills that gap: it instantiates :class:`game.game.Game`, drives full sub-games
 between two persistent actors, and (optionally) delivers ``on_result`` feedback
 — enabling both integration smoke tests and offline Q-learning training.
 
-This is tooling, not part of the ``actor_t6`` package contract.
+This is tooling, not part of the ``actor_brains`` package contract.
 """
 
 from __future__ import annotations

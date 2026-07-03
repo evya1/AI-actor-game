@@ -1,4 +1,4 @@
-"""Unit tests for actor_t6.config (Phase 0)."""
+"""Unit tests for actor_brains.config (Phase 0)."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import json
 
 import pytest
 
-from actor_t6 import config
+from actor_brains import config
 
 
 def test_load_defaults_when_file_missing(tmp_path):
