@@ -1,7 +1,12 @@
 # Task Tracking — Cop & Thief Actors
 
-## Version 2.2 | 2026-07-03
+## Version 2.3 | 2026-07-03
 
+> **Change from v2.2:** Added a pointer section for assignment-level work
+> owned by the shared submodule (partial observation, cloud deployment,
+> bonus game) — tracked there, not here, but noted so it isn't missed at
+> submission time.
+>
 > **Change from v2.1:** Added Phase 6 (quality-gate & CI infrastructure), tracked in PRs [#2](https://github.com/evya1/AI-actor-game/pull/2) and [#3](https://github.com/evya1/AI-actor-game/pull/3).
 >
 > **Change from v1.0:** Tests distributed across phases. Each phase ends with unit tests for its modules, so nothing is tested all at once. Original grouped version preserved in [TODO_ORIGINAL.md](TODO_ORIGINAL.md).
@@ -96,6 +101,31 @@
 | 4.3 | Learning curve visualization | P2 | Not Started | Graph of win rate vs. training episodes |
 | 4.4 | README.md — scientific report | P1 | Not Started | DecPOMDP formalization, orchestration analysis, screenshots |
 
+**External blocker on 4.1/4.2:** both depend on the submodule implementing
+`view_radius` filtering (Chebyshev distance) in `get_state`, which is
+tracked in `agent-orchestration-course-t6-common/docs/TODO.md` Phase 14 as
+still open. Not something this repo can implement — the submodule is
+read-only (CLAUDE.md).
+
+---
+
+## Assignment requirements owned by the shared submodule (not this repo)
+
+Per `docs/EX06_ASSIGNMENT.md`, parts 1–4 (Game, Agent, MCP, Gmail) are
+**shared** infrastructure built in `agent-orchestration-course-t6-common`,
+outside this repo's scope (`docs/PRD.md` §1.5). Its own
+`docs/TODO.md` Phase 14 ("Production Hardening") is 🚧 in progress, with
+three assignment-level items still open there — listed here only as a
+pointer so a submission-readiness check doesn't miss them:
+
+- Partial observation (`view_radius` Chebyshev filtering in `get_state`) —
+  assignment §3. Blocks TODO 4.1/4.2 above.
+- Cloud deployment of both MCP servers with public URLs — assignment §8.
+  Already flagged unchecked in `SUBMISSION_CHECKLIST.md`.
+- Bonus inter-group competition — assignment §12 (optional, +10).
+
+None of these are actor-side work; they can't be closed from this repo.
+
 ---
 
 ## Phase 6: Quality-Gate & CI Infrastructure
@@ -130,5 +160,5 @@ A task is **Done** when:
 
 ---
 
-*Document Version: 2.2*
+*Document Version: 2.3*
 *Last Updated: 2026-07-03*

@@ -1,7 +1,10 @@
 # Product Requirements Document (PRD) — Cop & Thief Actors
 
-## Version 1.3 | 2026-07-03
+## Version 1.4 | 2026-07-03
 
+> **Change from v1.3:** §2.3 and §9 checkboxes were stale (unchecked despite
+> being done) — synced with actual implementation status per `docs/TODO.md`.
+>
 > **Change from v1.2:** §1.1 links `docs/EX06_ASSIGNMENT.md`, the full
 > assignment brief copied from the shared submodule.
 >
@@ -95,12 +98,12 @@ We make our package importable by placing it under `src/actor_t6/` and setting `
 
 ### 2.3 Acceptance Criteria
 
-- [ ] Our actor implements `BaseActor.get_action()` and `on_result()`
-- [ ] Always returns a value from `obs.legal_moves` (never illegal)
-- [ ] Heuristic backend works for both Cop and Thief roles
-- [ ] RL backend implements Q-learning with save/load persistence
-- [ ] Actor loadable via `ACTOR_CLASS` env var (submodule integration)
-- [ ] All hyperparameters externalized to config
+- [x] Our actor implements `BaseActor.get_action()` and `on_result()`
+- [x] Always returns a value from `obs.legal_moves` (never illegal)
+- [x] Heuristic backend works for both Cop and Thief roles
+- [x] RL backend implements Q-learning with save/load persistence
+- [x] Actor loadable via `ACTOR_CLASS` env var (submodule integration)
+- [x] All hyperparameters externalized to config
 
 ---
 
@@ -355,23 +358,23 @@ actor-for-ex06/
 ## 9. Timeline
 
 ### Phase 1: Heuristic Baseline
-- [ ] HeuristicActor with role-based Cop/Thief logic
-- [ ] Scoring function (distance, barriers, edges, traps)
-- [ ] Config loading for heuristic weights
-- [ ] Validate via `run_match.py --mode actor` on 2×2 grid
+- [x] HeuristicActor with role-based Cop/Thief logic
+- [x] Scoring function (distance, barriers, edges, traps)
+- [x] Config loading for heuristic weights
+- [x] Validate via `run_match.py --mode actor` on 2×2 grid
 
 ### Phase 2: RL Backend
-- [ ] QTableActor with state encoder
-- [ ] Bellman update in `on_result()`
-- [ ] Epsilon-greedy policy with decay
-- [ ] `save()` / `load()` for Q-table persistence
-- [ ] Training loop and learning curve on 5×5 grid
+- [x] QTableActor with state encoder
+- [x] Bellman update in `on_result()`
+- [x] Epsilon-greedy policy with decay
+- [x] `save()` / `load()` for Q-table persistence
+- [x] Training loop on 5×5 grid — learning-curve **visualization** is still open, tracked as `docs/TODO.md` 4.3
 
 ### Phase 3: Integration & Validation
-- [ ] Tests (≥ 85% coverage)
-- [ ] Ruff lint — zero violations
-- [ ] All 5 integration steps pass (see [PLAN §4](PLAN.md#4-integration-testing-steps))
-- [ ] Final validation on 5×5 grid (6 sub-games)
+- [x] Tests (≥ 85% coverage) — 100% on our modules
+- [x] Ruff lint — zero violations
+- [x] All 5 integration steps pass (see [PLAN §4](PLAN.md#4-integration-testing-steps)) — verified offline against the real engine
+- [ ] Final validation on 5×5 grid (6 sub-games) via `run_match.py --mode actor` with a live LLM backend — the one open item in `docs/TODO.md` Phase 3
 
 ### Phase 4: Polish (Optional / Bonus)
 > Visibility mechanism not yet implemented in submodule. Deferred until submodule adds it.
@@ -397,5 +400,5 @@ A game consists of **6 sub-games**. Maximum combined score: **90**. Minimum: **3
 
 ---
 
-*Document Version: 1.3*
+*Document Version: 1.4*
 *Last Updated: 2026-07-03*
