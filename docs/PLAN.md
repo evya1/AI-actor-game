@@ -176,7 +176,7 @@ The key property is what GoF calls **"algorithms vary independently of the clien
 
 ### ADR-001: Single Actor Class for Both Roles
 
-**Status:** Accepted  
+**Status:** Accepted
 **Date:** 2026-06-25
 
 **Context:** The Cop and Thief share the same `BaseActor` interface. The submodule's `run_match.py` loads one `ACTOR_CLASS` for both servers, passing `role="cop"` or `role="thief"` to `load()`.
@@ -191,7 +191,7 @@ The key property is what GoF calls **"algorithms vary independently of the clien
 
 ### ADR-002: Relative Position Encoding for Q-Table
 
-**Status:** Accepted  
+**Status:** Accepted
 **Date:** 2026-06-25
 
 **Context:** A 5×5 grid has 25 cells. Absolute positions for both agents yield 25 × 25 = 625 position combinations, plus barrier configurations. This creates an unwieldy Q-table.
