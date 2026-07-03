@@ -18,8 +18,8 @@ def test_update_sets_estimate_from_visible_opponent():
 
 def test_estimate_retained_when_opponent_hidden():
     bs = BeliefState()
-    bs.update(make_obs(round=1, opponent_pos=(3, 2)))
-    bs.update(make_obs(round=2, opponent_pos=None))
+    bs.update(make_obs(round=0, opponent_pos=(3, 2)))
+    bs.update(make_obs(round=1, opponent_pos=None))
     assert bs.get_estimate() == (3, 2)  # last sighting retained
 
 
@@ -33,8 +33,22 @@ def test_estimate_refreshes_on_new_sighting():
 def test_new_subgame_resets_estimate():
     bs = BeliefState()
     bs.update(make_obs(round=4, opponent_pos=(3, 2)))
-    bs.update(make_obs(round=1, opponent_pos=None))  # new sub-game
+    bs.update(make_obs(round=0, opponent_pos=None))  # canonical new sub-game
     assert bs.get_estimate() is None
+
+
+def test_later_round_increments_retain_last_sighting():
+    bs = BeliefState()
+    bs.update(make_obs(round=2, opponent_pos=(3, 2)))
+    bs.update(make_obs(round=3, opponent_pos=None))
+    assert bs.get_estimate() == (3, 2)
+
+
+def test_full_observability_refreshes_every_turn():
+    bs = BeliefState()
+    bs.update(make_obs(round=0, opponent_pos=(3, 2)))
+    bs.update(make_obs(round=1, opponent_pos=(1, 4)))
+    assert bs.get_estimate() == (1, 4)
 
 
 def test_explicit_reset():

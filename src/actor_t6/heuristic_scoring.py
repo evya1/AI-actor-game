@@ -111,6 +111,8 @@ def score_move(my_pos: tuple[int, int], action: str,
         A float score; higher is better for this actor.
     """
     nxt = resolve_pos(my_pos, action)
+    if role == COP and target is not None and action not in _NON_MOVING_ACTIONS and nxt == target:
+        return float("inf")
     score = 0.0
     if target is not None:
         dist = chebyshev(nxt, target)

@@ -2,8 +2,8 @@
 
 Shared utility composed by both actor backends (ADR-003) so the partial-
 observability logic lives in exactly one place. It keeps a single point
-estimate of the opponent's cell: refreshed whenever ``opponent_pos`` is visible
-and cleared at the start of a new sub-game (detected via ``round == 1``).
+    estimate of the opponent's cell: refreshed whenever ``opponent_pos`` is visible
+    and cleared when the canonical round counter regresses to a new sub-game.
 
 Leaf module — depends on nothing inside actor_t6.
 """
@@ -28,20 +28,20 @@ class BeliefState:
     def __init__(self) -> None:
         """Initialise with no estimate and no observed round yet."""
         self._estimate: tuple[int, int] | None = None
-        self._last_round: int = 0
+        self._last_round: int | None = None
 
     def update(self, obs: ObservationState) -> None:
-        """Incorporate a new observation, resetting on a new sub-game.
+        """Incorporate a new observation, resetting on round regression.
 
-        A ``round == 1`` observation marks a fresh sub-game, so any stale
-        estimate from the previous sub-game is discarded first. When the
-        opponent is visible the estimate is refreshed to the exact position;
-        otherwise the previous estimate (last known sighting) is retained.
+        The pinned engine starts sub-games at round 0 and increments normally
+        within the sub-game, so a lower observed round is the reliable local
+        lifecycle signal. When the opponent is visible the estimate is refreshed;
+        otherwise the previous sighting is retained.
 
         Args:
             obs: The current observation for this actor.
         """
-        if obs.round <= 1:
+        if self._last_round is not None and obs.round < self._last_round:
             self.reset()
         self._last_round = obs.round
         if obs.opponent_pos is not None:
@@ -59,4 +59,4 @@ class BeliefState:
     def reset(self) -> None:
         """Clear the estimate for the start of a new sub-game."""
         self._estimate = None
-        self._last_round = 0
+        self._last_round = None
