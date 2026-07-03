@@ -11,6 +11,7 @@
   <img alt="max file size" src="https://img.shields.io/badge/max%20file-%E2%89%A4150%20lines-blue">
   <a href="LICENSE"><img alt="license: MIT" src="https://img.shields.io/badge/license-MIT-green"></a>
   <img alt="LLM cost" src="https://img.shields.io/badge/LLM%20cost-~1.5%C2%A2%20%2F%206--game%20series-brightgreen">
+  <img alt="metered dev spend" src="https://img.shields.io/badge/metered%20dev--spend-%240.008-brightgreen">
 </p>
 
 Team-specific **actor "brains"** for Exercise 6 of the AI Orchestration course
@@ -251,6 +252,25 @@ at ε=0, or the heuristic) — the LLM is called only to *narrate* the chosen mo
 so completions are ~15–20 tokens. Swap in a local Ollama model and the per-match
 cost drops to **$0**. At scale a full official series is ~1.2¢, so **1,000
 series ≈ $12** of narration.
+
+**Cost by backend** — a full 6-sub-game series (25-move cap ≈ 300 narration calls,
+~120 in / ~18 out each):
+
+| Backend / model | Rate (in / out per 1M) | Est. cost / series |
+|---|---|---:|
+| Ollama (local `llama3.2`) | free | **$0** |
+| OpenRouter `deepseek/deepseek-v3.2` | metered, blended | **~$0.012** (measured) |
+| Anthropic `claude-haiku-4-5` | $1 / $5 | ~$0.06 (list-price est.) |
+| Anthropic `claude-opus-4-8` | $5 / $25 | ~$0.32 (list-price est.) |
+
+Anthropic figures are illustrative list-price estimates, not measured. Since the
+actor — not the LLM — makes every decision, model choice affects only narration
+style and price, never play quality.
+
+**CI cost: $0.** The GitHub Actions workflow runs only keyless quality gates
+(ruff, line-cap, validators, secret/doc/link checks) and the test suite — no
+metered model calls. The one gated pytest job needs a read-only submodule deploy
+key, not a paid API key, so continuous integration never incurs LLM spend.
 
 **Development-cost transparency.** This repo was built with AI assistance
 (Claude Code + Codex). The **only real metered spend on the whole project was
