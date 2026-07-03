@@ -153,6 +153,39 @@ Copy `.env.example` → `.env` and fill in your chosen backend.
 > It auto-detects the backend and boots the OpenRouter adapter when needed. See
 > `docs/LLM_BACKENDS.md` for why the bare server makes no LLM calls.
 
+### Sample run (local end-to-end smoke)
+
+Verified local integration smoke — OpenRouter backend, model
+`deepseek/deepseek-v3.2`, seed 42 (exit 0; adapter + both MCP servers start,
+health checks pass, actor sub-games complete, children shut down cleanly). The
+Q-table actor picks each move; the LLM only narrates it. Abridged transcript:
+
+```text
+[match] seed=42 series_id=series0042 mode=actor game_type=internal
+[match] server(s) up — opponent: http://localhost:8002
+[sub-game 1/6  attempt 1]  a=thief b=cop
+[round 1]
+[gatekeeper] model=deepseek/deepseek-v3.2 in=94 out=19
+  thief says: "Continuing east to put distance between me and the cop while scanning for future escape routes."
+[gatekeeper] model=deepseek/deepseek-v3.2 in=126 out=15
+  cop says: "Moving southeast to close ground and anticipate your movement toward the eastern edge."
+[round 2]
+  thief says: "Slipping south to evade the pursuit closing in from the northeast and buy time."
+  cop says: "Moving northeast to intercept and trap the thief’s southern retreat."
+  ... (rounds 3–8) ...
+  winner=None (thief_survived)
+[sub-game 2/6  attempt 1]  a=cop b=thief
+  ...
+  winner=None (thief_survived)
+[series] totals: cop=10  thief=20
+[run_stack] adapter stopped
+```
+
+> Reproduce with:
+> `uv run python scripts/run_stack.py --backend openrouter local --mode actor --seed 42 --max-rounds 8 --num-games 2`
+> (needs `OPENROUTER_API_KEY` + `LLM_MODEL` exported; never commit keys). This is
+> a local integration smoke, **not** the official six-game session.
+
 ---
 
 ## Your strategy stays private
