@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "description": "Declarative manifest of GitHub milestones for AI-actor-game (ex06). Titles and descriptions must match the live GitHub state exactly. due_on is always null per the rule against fabricated due dates. Verify with: uv run python scripts/sync_milestones.py verify",
+  "milestones": [
+    {
+      "title": "Phase 3 — Full-stack QA",
+      "description": "Complete the run_match.py --mode actor smoke test with a chosen LLM backend (docs/LLM_BACKENDS.md); record CLI logs proving MCP communication. See docs/TODO.md Phase 3.",
+      "due_on": null
+    },
+    {
+      "title": "Cloud deployment",
+      "description": "Deploy both MCP servers to a public cloud with two public URLs and token-based auth supporting revoke (assignment §6). Evidence: URLs in the internal game report JSON.",
+      "due_on": null
+    },
+    {
+      "title": "Reporting — Gmail JSON",
+      "description": "Automated single email to the course address after 6 sub-games, body is JSON only per the internal game report schema (assignment §9); OAuth Desktop client per the Google API guide; credentials never tracked.",
+      "due_on": null
+    },
+    {
+      "title": "Scientific README",
+      "description": "Dec-POMDP formal model, orchestration-challenge analysis, learning curves, CLI logs, and GUI screenshots (assignment §11).",
+      "due_on": null
+    },
+    {
+      "title": "Submission",
+      "description": "SUBMISSION_CHECKLIST.md fully green, CI green on the submission commit, AI-usage disclosure present.",
+      "due_on": null
+    },
+    {
+      "title": "Bonus — Cross-team series",
+      "description": "Optional +10: cross-team cloud series with role swap after 3 sub-games; both teams email identical reports with mutual_agreement true (assignment §12).",
+      "due_on": null
+    }
+  ]
+}

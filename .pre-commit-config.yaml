@@ -1,0 +1,83 @@
+# Local hooks — pattern from ai-orchestration-ex4-finding-bugs, gate suite
+# from agentic-publishing-pipeline. A failing hook aborts the commit.
+#
+# Setup (one time):
+#   uv add --group dev pre-commit pyyaml
+#   uv run pre-commit install
+#
+# NOTE: the pytest hook requires the submodule (tests import game.state):
+#   git submodule update --init
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: ruff check
+        entry: uv run ruff check src tests scripts
+        language: system
+        pass_filenames: false
+
+      - id: pytest
+        name: pytest with coverage (>=85%)
+        entry: uv run pytest --cov=actor_t6 --cov-fail-under=85 -q
+        language: system
+        pass_filenames: false
+
+      - id: line-cap-src
+        name: line cap (src+tests, raw <=150)
+        entry: uv run python scripts/check_line_cap.py src tests --limit 150 --mode raw
+        language: system
+        pass_filenames: false
+
+      - id: line-cap-scripts
+        name: line cap (scripts, logical <=150)
+        entry: uv run python scripts/check_line_cap.py scripts --limit 150 --mode logical
+        language: system
+        pass_filenames: false
+
+      - id: validate-repo
+        name: project invariants (paths, actor isolation, models)
+        entry: uv run python scripts/validate_repo.py
+        language: system
+        pass_filenames: false
+
+      - id: no-secrets
+        name: secret scan
+        entry: uv run python scripts/check_no_secrets.py
+        language: system
+        pass_filenames: false
+
+      - id: docs-present
+        name: required docs present
+        entry: uv run python scripts/check_docs_present.py
+        language: system
+        pass_filenames: false
+
+      - id: markdown-links
+        name: markdown link check
+        entry: uv run python scripts/check_markdown_links.py
+        language: system
+        pass_filenames: false
+
+      - id: source-archives
+        name: no tracked archives
+        entry: uv run python scripts/check_source_archives.py
+        language: system
+        pass_filenames: false
+
+      - id: planning-ids
+        name: unique task IDs in TODO
+        entry: uv run python scripts/check_planning_ids.py
+        language: system
+        pass_filenames: false
+
+      - id: workflow-permissions
+        name: workflow permissions minimal
+        entry: uv run python scripts/check_workflow_permissions.py
+        language: system
+        pass_filenames: false
+
+      - id: readme-facts
+        name: README generated facts sync
+        entry: uv run python scripts/readme_sync.py check
+        language: system
+        pass_filenames: false
