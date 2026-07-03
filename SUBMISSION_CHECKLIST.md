@@ -66,6 +66,4 @@ reimplement here.
       repo secret (needs a read-only deploy key on the submodule repo;
       see `docs/TODO.md` task 6.4).
 - [ ] CI green on the submission commit (re-check at submission time).
-- [ ] AI-usage disclosure present (`docs/PROMPTS.md` / AI usage section) —
-      **`docs/PROMPTS.md` does not exist yet**; CLAUDE.md §6 requires a
-      prompt log — still to be created before submission.
+- [x] AI-usage disclosure present (`docs/PROMPTS.md` / AI usage section).
