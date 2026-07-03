@@ -2,9 +2,13 @@
 
 ## Scope
 
-This document records AI-assisted engineering usage for correctness remediation,
-release verification, model validation, documentation, and Git/submission
-preparation in `https://github.com/evya1/AI-actor-game`.
+This document records AI-assisted engineering usage across the full project
+lifecycle of `https://github.com/evya1/AI-actor-game` — initial build and
+exploration, planning, the Fable code review, correctness remediation, model
+validation, documentation, release verification, and Git/submission preparation
+— across both Claude Code and Codex. The numbered Runs (1--3, F) call out the
+key phases; the "Full Repository Accounting" tables below enumerate every
+session per engine.
 
 Token counts are reported execution metadata. Token counts do not by themselves
 establish monetary cost. Cached input is tracked separately. No monetary value
@@ -162,6 +166,49 @@ cached tokens; the last column is `total_tokens` (`input + output`).
 Non-cached input across all Codex sessions: `23,377,656 − 22,332,160 =
 1,045,496`. Cost status: not calculated — Codex transcripts record no monetary
 cost (plan-metered); no dollar value is estimated without verified rates.
+
+## Claude Sessions -- Full Repository Accounting
+
+Every Claude Code session recorded under this project
+(`~/.claude/projects/-home-dev-pop-os-hw6-actors/*.jsonl`), summed from
+per-message `message.usage`. This covers the whole project lifecycle: the
+June 25--26 build/exploration, the 2026-07-03 planning, the Fable review
+(Run F), and the Opus release session (Run 3). One empty session
+(`2a45411b`, 0 tokens) is omitted. `Cached` = cache-creation + cache-read.
+
+| Session | Date | Model | Phase / role | Input | Cached | Output | In+Out |
+|---|---|---|---|---:|---:|---:|---:|
+| `691d7362` | 06-25 | sonnet-4-6 | init | 6 | 39,128 | 316 | 322 |
+| `4350d608` | 06-25 | sonnet-4-6 | init | 28 | 708,069 | 1,958 | 1,986 |
+| `820cfef2` | 06-25 | opus-4-8 | build — repo/submodule study | 65,635 | 30,863,059 | 266,762 | 332,397 |
+| `f03729ad` | 06-25 | opus-4-8 | build — repo/submodule study | 68,843 | 61,537,512 | 410,291 | 479,134 |
+| `784b3692` | 06-25 | opus-4-8 | build — submodule/actors | 52,969 | 49,019,687 | 452,831 | 505,800 |
+| `23f8df19` | 06-26 | opus-4-8 | build — launcher common-dir | 13,177 | 8,094,165 | 118,599 | 131,776 |
+| `c90fb7b4` | 06-26 | opus-4-8 | build (interrupted) | 29,344 | 8,869,668 | 279,341 | 308,685 |
+| `17696d69` | 07-03 | sonnet-5 | planning / quality-gates | 56,871 | 74,991,333 | 264,045 | 320,916 |
+| `31e045cf` | 07-03 | fable-5 | **Run F** — Fable review | 52,313 | 6,165,602 | 169,025 | 221,338 |
+| `3810214b` | 07-03 | opus-4-8 | **Run 3** — release/smoke/PR | 11,657 | 6,793,421 | 81,096 | 92,753 |
+| `701a28fc` | 07-03 | opus-4-8 | **Run 3** — release/smoke/PR (cont.) | 17,747 | 30,211,453 | 260,214 | 277,961 |
+| **Claude total (11 sessions)** | | | | **368,590** | **277,293,097** | **2,304,478** | **2,673,068** |
+
+Run 3 spans two transcripts and is a live snapshot that keeps growing while the
+session is active. The build sessions (June + the 07-03 planning session) were
+outside the original remediation/release scope and are included here for a
+complete project-wide picture.
+
+## Project-Wide Token Total (Claude + Codex)
+
+| Engine | Sessions | Non-cached input | Output | Non-cached in+out |
+|---|---:|---:|---:|---:|
+| Claude (this project) | 11 | 368,590 | 2,304,478 | 2,673,068 |
+| Codex (this project) | 12 | 1,045,496 | 104,816 | 1,150,312 |
+| **Combined** | **23** | **1,414,086** | **2,409,294** | **3,823,380** |
+
+Cached-input tokens are large and tracked separately per engine (Claude
+277,293,097; Codex 22,332,160) and are not added into the non-cached in+out
+total. Cost status: not calculated — no Claude or Codex transcript records a
+`costUSD` field; all sessions were subscription/plan-metered. No dollar value is
+estimated without verified rates.
 
 ## Run Comparison
 
