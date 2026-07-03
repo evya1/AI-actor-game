@@ -19,6 +19,7 @@ implementation, regression tests, validation, and commits.
 | Adapter port/env not forwarded | Fixed | Adapter child inherited env without validated launcher values. | Pass `ADAPTER_HOST`, `ADAPTER_PORT`, and `OLLAMA_BASE_URL`. | `tests/test_launch_common.py` | `cd5366b` |
 | Adapter readiness failure leaked child | Fixed | `start_adapter()` did not clean up after readiness exception. | Terminate/wait child on failure; forced kill fallback in `stop_process()`. | `tests/test_launch_lifecycle.py` | `cd5366b` |
 | Launcher suppressed child failures | Fixed | `subprocess.run(..., check=False)` return codes were ignored. | Return child status from local/cross-team paths and `SystemExit(main())`. | `tests/test_run_stack.py` | `cd5366b` |
+| OpenRouter smoke never reached the LLM | Fixed | `start_adapter()` set `OLLAMA_BASE_URL` only on the adapter subprocess's env; the Gatekeeper (in the separately-spawned `run_match`/MCP servers) inherited the parent env and dialed the default Ollama port → `Connection refused`. | Publish `OLLAMA_BASE_URL` to `os.environ` so downstream processes inherit the adapter URL. | `tests/test_launch_common.py` | (this branch) |
 | Existing Q-tables invalid after RL fixes | Fixed | Artifacts were trained with bad terminal and bootstrap semantics. | Deterministic retrain with seed 42, 2000 episodes per role. | `docs/QTABLE_RETRAINING_REPORT.md` | `f5f3828` |
 
 ## Rejected After Verification
@@ -31,3 +32,9 @@ local fix uses the append-only game-log position available to this repository.
 
 Each code/model commit ran the repository pre-commit suite successfully. Final
 full-suite validation is recorded in the final response for this branch.
+
+A local end-to-end smoke test passed after the launcher `OLLAMA_BASE_URL` fix:
+`scripts/run_stack.py --backend openrouter local --mode actor --seed 42`
+(model `deepseek/deepseek-v3.2`) exits 0 — the adapter and both MCP servers
+start, health checks pass, actor sub-games complete, and all children shut down
+cleanly. This is a local integration smoke, not the official six-game session.

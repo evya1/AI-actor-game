@@ -66,6 +66,11 @@ reimplement here.
 - [x] Correctness remediation evidence recorded in
       `docs/CODE_REVIEW_REMEDIATION.md` and model retraining evidence in
       `docs/QTABLE_RETRAINING_REPORT.md`.
+- [x] Local end-to-end smoke passed (exit 0): OpenRouter backend, model
+      `deepseek/deepseek-v3.2`, `scripts/run_stack.py --backend openrouter local
+      --mode actor --seed 42` — adapter + both MCP servers start, health checks
+      pass, actor sub-games complete, children shut down cleanly. This is a
+      local integration smoke, not the official six-game session.
 - [x] 11-hook pre-commit suite wired and installed (`.pre-commit-config.yaml`,
       `uv run pre-commit install`); verified firing on a real commit
       (PR [#3](https://github.com/evya1/AI-actor-game/pull/3)).
