@@ -186,6 +186,19 @@ Q-table actor picks each move; the LLM only narrates it. Abridged transcript:
 > (needs `OPENROUTER_API_KEY` + `LLM_MODEL` exported; never commit keys). This is
 > a local integration smoke, **not** the official six-game session.
 
+**LLM cost is negligible.** Each round makes 2 LLM calls (thief + cop). Measured
+on OpenRouter with `deepseek/deepseek-v3.2` (blended ~$0.0000413/call over 199
+billed calls, $0.0082 total):
+
+| Unit | LLM calls | Est. cost |
+|---|---:|---:|
+| 1 round | 2 | $0.00008 |
+| 1 sub-game (~8–25 moves) | 16–50 | $0.0007–$0.0021 |
+| Full 6-sub-game series | 96–300 | **$0.004–$0.012** |
+
+So a complete official 6-sub-game series is roughly **1–1.5 US cents** of LLM
+spend. Full breakdown in [`docs/AI_USAGE_AND_COST.md`](docs/AI_USAGE_AND_COST.md).
+
 ---
 
 ## Your strategy stays private

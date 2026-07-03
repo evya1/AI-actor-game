@@ -118,6 +118,43 @@ per-token API billing, so no per-session monetary cost is recorded. No dollar
 value is estimated without a verified billing model and rates. If run under API
 billing, apply the Cost Calculation Template below to these token counts.
 
+## Smoke-Test LLM Cost (OpenRouter, metered)
+
+Unlike the plan-metered agent sessions above, the local smoke test's LLM calls
+went through **OpenRouter** and carry real per-generation cost. Figures below
+are computed directly from the OpenRouter generation export
+(`app_name = "Cop & Thief actor_t6"`, model `deepseek/deepseek-v3.2`,
+2026-07-03), covering both smoke runs that day.
+
+| Metric | Value |
+|---|---|
+| Billed LLM calls (generations) | 199 |
+| Total cost | **$0.008212** (~0.82 cents) |
+| Average cost per call | **$0.0000413** (~0.004 cents) |
+| Average tokens per call | 121 prompt / 18 completion |
+| Provider cost spread (avg $/call) | Baidu $0.000019 → Google $0.000098 (~5×) |
+
+OpenRouter routed calls across ~11 providers at different prices, so per-call
+cost varies ~5×; the average above is the blended rate actually paid.
+
+**Derived game economics.** Each round is **2 LLM calls** (one thief move
+narration + one cop move narration). Using the blended $0.0000413/call:
+
+| Unit | Calls | Estimated cost |
+|---|---:|---:|
+| 1 round | 2 | $0.000083 |
+| 1 sub-game @ 8 rounds (smoke cap) | 16 | $0.00066 |
+| 1 sub-game @ 25 moves (official cap) | 50 | $0.00206 |
+| Full 6-sub-game series @ 8 rounds | 96 | $0.00396 |
+| Full 6-sub-game series @ 25 moves | 300 | $0.01238 |
+
+These are estimates from today's blended OpenRouter pricing for
+`deepseek/deepseek-v3.2`; actual cost scales with rounds-per-sub-game (a capture
+ends a sub-game early) and with which providers OpenRouter routes to. A full
+official 6-sub-game series therefore costs roughly **1--1.5 US cents** of LLM
+spend at this model. This is the only genuinely metered cost in this document;
+the Claude and Codex agent sessions were plan-metered with no per-token charge.
+
 ## Run F -- Fable Code Review (Claude)
 
 | Field | Value |
