@@ -14,6 +14,29 @@ executes inside the project's resolved environment.
 | `peer_sync.py`, `launch_common.py` | Launcher plumbing | yes |
 | `openrouter_adapter.py` | Ollama-compatible shim → OpenRouter | no |
 
+Model provenance for corrected Q-tables is recorded in
+`models/qtable_manifest.json`; before/after evaluation is in
+`docs/QTABLE_RETRAINING_REPORT.md`.
+
+### Local end-to-end smoke test
+
+For a full local smoke without a local Ollama daemon, use the OpenRouter backend.
+`run_stack.py` boots the stdlib `openrouter_adapter.py` and points the
+Gatekeeper at it, so no `ollama serve` is needed. Configure via environment
+variables (never commit keys or `.env`):
+
+```sh
+export OPENROUTER_API_KEY='...'
+export LLM_MODEL='deepseek/deepseek-v3.2'   # or another cheap OpenRouter model
+uv run python scripts/run_stack.py --backend openrouter local --mode actor --seed 42
+```
+
+Bound a quick series with `--max-rounds` / `--num-games` (forwarded to
+`run_match.py`), e.g. `... --seed 42 --max-rounds 8 --num-games 2`. A clean run
+exits 0, completes the actor sub-games, and shuts the adapter and both MCP
+servers down. Without `OPENROUTER_API_KEY`/`ANTHROPIC_API_KEY`, `auto`
+backend-selection falls back to Ollama at `localhost:11434`.
+
 ## Quality gates (wired into pre-commit + CI, no submodule needed)
 
 | Script | Origin | Purpose |

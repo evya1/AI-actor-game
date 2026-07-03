@@ -3,6 +3,9 @@
 ## Version 1.1 | 2026-07-03
 
 > **Change from v1.0:** Added §8 Quality Gates & CI Tooling.
+>
+> **Change from v1.1:** Added correctness remediation notes for RL updates,
+> belief lifecycle, peer protocol alignment, and launcher process ownership.
 
 ---
 
@@ -18,7 +21,7 @@ C4Context
     System(submodule, "agent-orchestration-course-t6-common", "Game engine, MCP servers, LLM wrapper, match orchestrator")
     System_Ext(llm, "LLM Provider", "Ollama or Anthropic — generates NL messages")
 
-    Boundary(our_scope, "Our Scope (actor_t6)") {
+    Boundary(our_scope, "Our Scope (actor_brains)") {
         System(actors, "Actor Backends", "HeuristicActor, QTableActor — decide each move")
     }
 
@@ -38,7 +41,7 @@ C4Container
     Container(server_b, "MCP Server B :8002", "Python/FastMCP", "Cop server (submodule)")
     Container(llm_svc, "LLM Service", "Ollama / Anthropic", "NL message generation")
 
-    Boundary(our_code, "actor_t6 (our package)") {
+    Boundary(our_code, "actor_brains (our package)") {
         Container(heuristic, "HeuristicActor", "Python", "Rule-based decision backend")
         Container(qtable, "QTableActor", "Python", "Q-learning decision backend")
         Container(encoder, "StateEncoder", "Python", "Game state → Q-table index")
@@ -57,9 +60,9 @@ C4Container
 
 ```mermaid
 C4Component
-    title C4 Component — actor_t6 Package
+    title C4 Component — actor_brains Package
 
-    Boundary(actor_t6, "actor_t6") {
+    Boundary(actor_brains, "actor_brains") {
         Component(heuristic_actor, "HeuristicActor", "BaseActor subclass", "Weighted scoring over legal moves")
         Component(qtable_actor, "QTableActor", "BaseActor subclass", "Epsilon-greedy Q-learning policy")
         Component(state_encoder, "StateEncoder", "Utility", "Relative position + barriers → state index")
@@ -173,7 +176,7 @@ The key property is what GoF calls **"algorithms vary independently of the clien
 
 ### ADR-001: Single Actor Class for Both Roles
 
-**Status:** Accepted  
+**Status:** Accepted
 **Date:** 2026-06-25
 
 **Context:** The Cop and Thief share the same `BaseActor` interface. The submodule's `run_match.py` loads one `ACTOR_CLASS` for both servers, passing `role="cop"` or `role="thief"` to `load()`.
@@ -188,7 +191,7 @@ The key property is what GoF calls **"algorithms vary independently of the clien
 
 ### ADR-002: Relative Position Encoding for Q-Table
 
-**Status:** Accepted  
+**Status:** Accepted
 **Date:** 2026-06-25
 
 **Context:** A 5×5 grid has 25 cells. Absolute positions for both agents yield 25 × 25 = 625 position combinations, plus barrier configurations. This creates an unwieldy Q-table.
@@ -215,6 +218,35 @@ The key property is what GoF calls **"algorithms vary independently of the clien
 - **Pro:** Testable independently
 - **Con:** Adds an indirection layer — acceptable given the shared need
 - **Alt considered:** Mixin class — rejected because composition is cleaner and more testable
+
+**Remediation update (2026-07-03):** The pinned engine initializes a sub-game at
+round `0` and increments rounds normally, so `BeliefState` resets on observed
+round regression rather than on `round <= 1`. This preserves a round-0 sighting
+through normal round-1 progression while still clearing stale estimates on a new
+sub-game or explicit `reset()`.
+
+### ADR-006: Correct Learning Targets and Terminal Feedback
+
+**Status:** Accepted  
+**Date:** 2026-07-03
+
+Self-play tracks each actor's latest unresolved transition. Non-terminal
+feedback still goes only to the mover, but a terminal result is delivered once
+to every actor with an unresolved action. Q-learning Bellman targets now compute
+`max Q(s', a')` only over the next observation's `legal_moves`; illegal
+role-specific or blocked actions never influence the target.
+
+### ADR-007: Canonical Peer Protocol and Launcher Ownership
+
+**Status:** Accepted  
+**Date:** 2026-07-03
+
+Cross-team orchestration derives `grid_size`, `view_radius`, `max_moves`,
+timeouts, and forfeit tolerance from the pinned submodule configuration and
+uses its proposal compatibility helper. Environment loading precedes
+environment-sensitive imports. Launcher helpers own the processes they spawn:
+child configuration is explicit, readiness failure cleans up the child, and
+subprocess exit status is returned through `main()`.
 
 ### ADR-004: Config via JSON + Environment Variables
 
@@ -270,7 +302,7 @@ Five steps, each verified before moving to the next. Each step uses the submodul
 ```bash
 cd agent-orchestration-course-t6-common
 PYTHONPATH=../src uv run python -c "
-from actor_t6.heuristic_actor import HeuristicActor
+from actor_brains.heuristic_actor import HeuristicActor
 a = HeuristicActor()
 print('OK:', a)
 "
@@ -288,7 +320,7 @@ print('OK:', a)
 cd agent-orchestration-course-t6-common
 uv run python scripts/run_match.py \
     --mode actor \
-    --actor-class actor_t6.heuristic_actor.HeuristicActor \
+    --actor-class actor_brains.heuristic_actor.HeuristicActor \
     --seed 42
 ```
 
@@ -323,7 +355,7 @@ Same command as Step 2 with default 5×5 grid and `max_moves: 25` from submodule
 ```bash
 uv run python scripts/run_match.py \
     --mode actor \
-    --actor-class actor_t6.qtable_actor.QTableActor \
+    --actor-class actor_brains.qtable_actor.QTableActor \
     --seed 42
 ```
 
@@ -338,7 +370,7 @@ uv run python scripts/run_match.py \
 ```bash
 uv run python scripts/run_match.py \
     --mode actor \
-    --actor-class actor_t6.qtable_actor.QTableActor \
+    --actor-class actor_brains.qtable_actor.QTableActor \
     --models-dir models \
     --seed 42
 ```
@@ -493,7 +525,7 @@ The three reward-shaping keys (`win_reward`, `lose_reward`, `step_cost`) define
 the offline training signal: a terminal win/loss reward plus a per-step cost
 (negative for the cop to reward fast capture, positive for the thief to reward
 survival). They were added during Phase 2 implementation; defaults also live in
-`actor_t6.config.DEFAULTS`.
+`actor_brains.config.DEFAULTS`.
 
 ### 6.2 Q-Table Format
 
@@ -550,7 +582,7 @@ convention.
    minimal workflow `permissions:`, and a generated `repo-facts` region in
    `README.md`. See `scripts/README.md` for the full list and provenance.
 2. **`.pre-commit-config.yaml`** — wires all 9 scripts plus `ruff check` and
-   `pytest --cov=actor_t6 --cov-fail-under=85` into 11 local hooks. Installed
+   `pytest --cov=actor_brains --cov-fail-under=85` into 11 local hooks. Installed
    once per clone via `uv run pre-commit install`; from then on every
    `git commit` runs the full suite.
 3. **`.github/workflows/ci.yml`** — mirrors the same checks in two layers:

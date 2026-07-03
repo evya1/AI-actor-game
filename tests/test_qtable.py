@@ -1,11 +1,11 @@
-"""Unit tests for actor_t6.qtable_actor (Phase 2)."""
+"""Unit tests for actor_brains.qtable_actor (Phase 2)."""
 
 from __future__ import annotations
 
 import numpy as np
 
-from actor_t6.qtable_actor import ACTIONS, QTableActor
-from actor_t6.state_encoder import StateEncoder
+from actor_brains.qtable_actor import ACTIONS, QTableActor
+from actor_brains.state_encoder import StateEncoder
 from tests.conftest import make_obs, make_result
 
 GRID = (5, 5)

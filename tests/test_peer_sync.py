@@ -11,6 +11,8 @@ import json
 import sys
 from pathlib import Path
 
+import pytest
+
 _SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
 if str(_SCRIPTS) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS))
@@ -59,6 +61,34 @@ def test_read_terminal_empty_when_ongoing(tmp_path):
     assert ps.read_terminal(tmp_path, "missing") == {}
 
 
+def test_read_terminal_ignores_one_torn_trailing_line(tmp_path):
+    game_dir = tmp_path / "g3"
+    game_dir.mkdir()
+    (game_dir / "game.log").write_text(
+        json.dumps({"type": "terminal", "winner": "cop"}) + "\n"
+        + '{"type": "terminal"'
+    )
+    assert ps.read_terminal(tmp_path, "g3")["winner"] == "cop"
+
+
+def test_read_terminal_raises_on_persistent_corruption(tmp_path):
+    game_dir = tmp_path / "g4"
+    game_dir.mkdir()
+    (game_dir / "game.log").write_text(
+        json.dumps({"type": "terminal", "winner": "cop"}) + "\n"
+        + "{bad\n{also_bad"
+    )
+    with pytest.raises(json.JSONDecodeError):
+        ps.read_terminal(tmp_path, "g4")
+
+
+def test_log_position_counts_nonblank_lines(tmp_path):
+    game_dir = tmp_path / "g5"
+    game_dir.mkdir()
+    (game_dir / "game.log").write_text("\n{}\n {bad\n")
+    assert ps.log_position(tmp_path, "g5") == 2
+
+
 def _run(coro):
     return asyncio.run(coro)
 
@@ -93,3 +123,16 @@ def test_wait_for_opponent_times_out():
 
     out = _run(ps.wait_for_opponent(fetch, lambda: {}, before, timeout=0.1, poll=0.02))
     assert out["status"] == "timeout"
+
+
+def test_wait_for_opponent_uses_log_position_marker():
+    start = {"round": 1, "my_pos": [0, 0], "opponent_pos": None, "barriers": []}
+
+    async def fetch():
+        return dict(start)
+
+    out = _run(ps.wait_for_opponent(
+        fetch, lambda: {}, ps.state_fingerprint(start), timeout=1.0, poll=0.01,
+        log_check=lambda: 4, min_log_position=4,
+    ))
+    assert out["status"] == "moved"

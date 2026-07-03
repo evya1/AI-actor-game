@@ -1,4 +1,4 @@
-"""Repository validation — project-specific invariants for actor_t6.
+"""Repository validation — project-specific invariants for actor_brains.
 
 Adapted from ai-orchestration-ex4-finding-bugs. Generic gates live in
 dedicated scripts (check_line_cap, check_no_secrets, check_docs_present,
@@ -56,12 +56,12 @@ def check_actor_isolation() -> Violations:
     """Check 2: heuristic and qtable actors never import each other."""
     hits = []
     for name, banned in _ACTOR_ISOLATION.items():
-        path = ROOT / "src" / "actor_t6" / name
+        path = ROOT / "src" / "actor_brains" / name
         if not path.exists():
             continue
         text = path.read_text(encoding="utf-8")
         for mod in banned:
-            if re.search(rf"(?m)^\s*(from|import)\s+(actor_t6\.)?{mod}\b", text):
+            if re.search(rf"(?m)^\s*(from|import)\s+(actor_brains\.)?{mod}\b", text):
                 hits.append(f"ACTOR_ISOLATION: {name} imports {mod}")
     return hits
 

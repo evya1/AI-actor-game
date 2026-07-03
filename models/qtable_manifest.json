@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-07-03",
+  "training": {
+    "command": "uv run python scripts/train_qtable.py --episodes 2000 --seed 42 --grid 5 --models-dir models",
+    "episodes_per_role": 2000,
+    "seed": 42,
+    "grid_size": [5, 5],
+    "rl_config_sha256": "1fa26efeb2e80813e779d755afc3df8c544d3e389e23dd77d916ded9de4e1b48",
+    "submodule_commit": "d86903d8788254ecc9f860aec92ef10c08fd8299",
+    "action_order": ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "BARRIER", "STAY"]
+  },
+  "artifacts": {
+    "cop": {
+      "path": "models/cop_qtable.npy",
+      "role": "cop",
+      "shape": [649, 10],
+      "sha256": "7f3fccabe069de3e1876a04adcb32bc82ffd8c96ab9f7d3078503f811b96f36f"
+    },
+    "thief": {
+      "path": "models/thief_qtable.npy",
+      "role": "thief",
+      "shape": [649, 10],
+      "sha256": "8cd800faefad111aebb47fe5f8f286d2f6a855fd26c3089a6da0f94f337cfc82"
+    }
+  },
+  "evaluation": {
+    "seeds": "1000..1049",
+    "opponents": {
+      "cop": "HeuristicActor thief",
+      "thief": "HeuristicActor cop"
+    },
+    "new": {
+      "cop": {"wins": 9, "losses": 41, "mean_rounds": 20.94, "median_rounds": 25.0},
+      "thief": {"wins": 45, "losses": 5, "mean_rounds": 22.66, "median_rounds": 25.0}
+    }
+  }
+}

@@ -14,6 +14,8 @@ import argparse
 import sys
 from pathlib import Path
 
+import numpy as np
+
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 for _p in (_REPO_ROOT / "src", _REPO_ROOT / "agent-orchestration-course-t6-common" / "src"):
     if str(_p) not in sys.path:
@@ -21,8 +23,8 @@ for _p in (_REPO_ROOT / "src", _REPO_ROOT / "agent-orchestration-course-t6-commo
 
 from selfplay import derive_positions, play_game  # noqa: E402
 
-from actor_t6.heuristic_actor import HeuristicActor  # noqa: E402
-from actor_t6.qtable_actor import QTableActor  # noqa: E402
+from actor_brains.heuristic_actor import HeuristicActor  # noqa: E402
+from actor_brains.qtable_actor import QTableActor  # noqa: E402
 
 
 def train(episodes: int, seed: int, grid: tuple[int, int]) -> dict[str, QTableActor]:
@@ -42,6 +44,8 @@ def train(episodes: int, seed: int, grid: tuple[int, int]) -> dict[str, QTableAc
     """
     cop_learner = QTableActor(role="cop", grid_size=grid)
     thief_learner = QTableActor(role="thief", grid_size=grid)
+    cop_learner._rng = np.random.default_rng(seed)
+    thief_learner._rng = np.random.default_rng(seed + 1)
     for ep in range(episodes):
         cop_pos, thief_pos = derive_positions(seed + ep, grid)
         play_game(cop_learner, HeuristicActor(role="thief"),

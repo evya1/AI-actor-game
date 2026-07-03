@@ -7,7 +7,7 @@ fills that gap: it instantiates :class:`game.game.Game`, drives full sub-games
 between two persistent actors, and (optionally) delivers ``on_result`` feedback
 — enabling both integration smoke tests and offline Q-learning training.
 
-This is tooling, not part of the ``actor_t6`` package contract.
+This is tooling, not part of the ``actor_brains`` package contract.
 """
 
 from __future__ import annotations
@@ -27,7 +27,17 @@ from game.game import Game  # noqa: E402
 
 if TYPE_CHECKING:
     from actor.base_actor import BaseActor
-    from game.state import ActionResult
+    from game.state import ActionResult, ObservationState
+
+
+def _deliver_terminal(
+    pending: dict[str, tuple[BaseActor, ObservationState, str]],
+    result: ActionResult,
+) -> None:
+    """Deliver one terminal result to every actor with an unresolved action."""
+    for _, (brain, obs, action) in tuple(pending.items()):
+        brain.on_result(obs, action, result)
+    pending.clear()
 
 
 def derive_positions(seed: int, grid: tuple[int, int]) -> tuple[tuple, tuple]:
@@ -73,6 +83,7 @@ def play_game(cop: BaseActor, thief: BaseActor, *, grid: tuple[int, int],
     """
     game = Game.new("selfplay", grid, cop_pos, thief_pos, {"max_moves": max_rounds})
     last: ActionResult | None = None
+    pending: dict[str, tuple[BaseActor, ObservationState, str]] = {}
     for _ in range(max_rounds + 2):
         if game.to_dict()["game_over"]:
             break
@@ -85,6 +96,10 @@ def play_game(cop: BaseActor, thief: BaseActor, *, grid: tuple[int, int],
             result = game.submit_action(actor, action)
             assert result.success, result.error
             if learn:
-                brain.on_result(obs, action, result)
+                pending[actor] = (brain, obs, action)
+                if result.game_over:
+                    _deliver_terminal(pending, result)
+                else:
+                    brain.on_result(obs, action, result)
             last = result
     return last  # type: ignore[return-value]

@@ -1,4 +1,4 @@
-"""Shared test fixtures and observation builders for actor_t6 tests."""
+"""Shared test fixtures and observation builders for actor_brains tests."""
 
 from __future__ import annotations
 

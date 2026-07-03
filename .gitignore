@@ -218,7 +218,7 @@ __marimo__/
 .streamlit/secrets.toml
 
 # ---------------------------------------------------------------------------
-# Project-specific (actor_t6)
+# Project-specific (actor_brains)
 # ---------------------------------------------------------------------------
 ex06.md            # scratch notes, not part of the deliverable
 

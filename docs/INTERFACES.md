@@ -57,7 +57,7 @@ class BaseActor(ABC):
 
 ### 2.1 HeuristicActor
 
-**File:** `src/actor_t6/heuristic_actor.py`  
+**File:** `src/actor_brains/heuristic_actor.py`  
 **Phase:** 1 (Heuristic Baseline)  
 **Extends:** `BaseActor`
 
@@ -95,7 +95,7 @@ class HeuristicActor(BaseActor):
 
 ### 2.2 QTableActor
 
-**File:** `src/actor_t6/qtable_actor.py`  
+**File:** `src/actor_brains/qtable_actor.py`  
 **Phase:** 2 (RL Backend)  
 **Extends:** `BaseActor`
 
@@ -133,7 +133,7 @@ class QTableActor(BaseActor):
 
 ### 2.3 StateEncoder
 
-**File:** `src/actor_t6/state_encoder.py`  
+**File:** `src/actor_brains/state_encoder.py`  
 **Phase:** 2 (RL Backend)  
 **Type:** Utility (static methods)
 
@@ -153,13 +153,16 @@ class StateEncoder:
 
 ### 2.4 BeliefState
 
-**File:** `src/actor_t6/belief_state.py`  
+**File:** `src/actor_brains/belief_state.py`  
 **Phase:** 1 (Heuristic Baseline)  
 **Type:** Utility (shared by both actors)
 
 ```python
 class BeliefState:
-    """Tracks estimated opponent position under partial observability."""
+    """Tracks estimated opponent position under partial observability.
+
+    A new sub-game is detected by canonical round regression, not by round 1.
+    """
 
     def update(self, obs: ObservationState) -> None:
         """Incorporate new observation. Sets estimate from opponent_pos if known."""
@@ -173,7 +176,7 @@ class BeliefState:
 
 ### 2.5 Config Loader
 
-**File:** `src/actor_t6/config.py`  
+**File:** `src/actor_brains/config.py`  
 **Phase:** 0 (Project Setup)  
 **Type:** Module-level functions
 

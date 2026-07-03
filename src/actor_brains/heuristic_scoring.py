@@ -1,6 +1,6 @@
 """Pure scoring helpers for the heuristic actor.
 
-Extracted from :mod:`actor_t6.heuristic_actor` to keep each file within the
+Extracted from :mod:`actor_brains.heuristic_actor` to keep each file within the
 150-line limit and to make the scoring logic independently testable. All
 functions are stateless and operate on plain tuples, so they carry no game
 state of their own.
@@ -111,6 +111,8 @@ def score_move(my_pos: tuple[int, int], action: str,
         A float score; higher is better for this actor.
     """
     nxt = resolve_pos(my_pos, action)
+    if role == COP and target is not None and action not in _NON_MOVING_ACTIONS and nxt == target:
+        return float("inf")
     score = 0.0
     if target is not None:
         dist = chebyshev(nxt, target)

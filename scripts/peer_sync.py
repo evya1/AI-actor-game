@@ -64,12 +64,27 @@ def read_terminal(games_base: Path | str, game_id: str) -> dict:
     log_path = Path(games_base) / game_id / "game.log"
     if not log_path.exists():
         return {}
+    skipped_torn = False
     for raw in reversed(log_path.read_text().splitlines()):
         if raw.strip():
-            entry = json.loads(raw)
+            try:
+                entry = json.loads(raw)
+            except json.JSONDecodeError:
+                if not skipped_torn:
+                    skipped_torn = True
+                    continue
+                raise
             if entry.get("type") == "terminal":
                 return entry
     return {}
+
+
+def log_position(games_base: Path | str, game_id: str) -> int:
+    """Return the count of nonblank log records written for ``game_id``."""
+    log_path = Path(games_base) / game_id / "game.log"
+    if not log_path.exists():
+        return 0
+    return sum(1 for raw in log_path.read_text().splitlines() if raw.strip())
 
 
 async def wait_for_opponent(
@@ -78,6 +93,8 @@ async def wait_for_opponent(
     before: tuple,
     timeout: float,
     poll: float,
+    log_check: Callable[[], int] | None = None,
+    min_log_position: int | None = None,
 ) -> dict:
     """Poll until the opponent's move lands, the game ends, or timeout elapses.
 
@@ -87,6 +104,8 @@ async def wait_for_opponent(
         before: Fingerprint captured after our own move (the baseline to beat).
         timeout: Maximum seconds to wait for the opponent.
         poll: Seconds to sleep between polls.
+        log_check: Optional callable returning the current game-log position.
+        min_log_position: Optional minimum log position proving the opponent moved.
 
     Returns:
         Dict with ``status`` in {"moved", "game_over", "timeout"} and a
@@ -97,6 +116,9 @@ async def wait_for_opponent(
         terminal = terminal_check()
         if terminal:
             return {"status": "game_over", "terminal": terminal}
+        if log_check is not None and min_log_position is not None:
+            if log_check() >= min_log_position:
+                return {"status": "moved", "terminal": {}}
         obs = await fetch_state()
         if "error" not in obs and state_fingerprint(obs) != before:
             return {"status": "moved", "terminal": {}}

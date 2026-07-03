@@ -16,7 +16,7 @@ if str(_SCRIPTS) not in sys.path:
 
 from selfplay import derive_positions, play_game  # noqa: E402
 
-from actor_t6.heuristic_actor import HeuristicActor  # noqa: E402
+from actor_brains.heuristic_actor import HeuristicActor  # noqa: E402
 
 
 def test_smoke_2x2_completes_legally():

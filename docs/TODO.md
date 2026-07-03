@@ -13,7 +13,7 @@
 
 ## Implementation Status (v2.1)
 
-- ✅ **Phase 0 — Setup:** `actor_t6` package, `config/actor_config.json`, `config.py` (defaults + schema validation), `shared/version.py` (1.00), `pyproject.toml` (numpy, ruff, pytest). Tests pass.
+- ✅ **Phase 0 — Setup:** `actor_brains` package, `config/actor_config.json`, `config.py` (defaults + schema validation), `shared/version.py` (1.00), `pyproject.toml` (numpy, ruff, pytest). Tests pass.
 - ✅ **Phase 1 — Heuristic:** `belief_state.py`, `heuristic_actor.py` (+ `heuristic_scoring.py` extracted for the 150-line limit), role-aware Cop/Thief scoring, save/load tolerant of a missing file. Unit + integration tests pass on the real engine.
 - ✅ **Phase 2 — RL:** `state_encoder.py` (relative encoding, ADR-002), `qtable_actor.py` (ε-greedy + Bellman + decay + save/load), `scripts/train_qtable.py` + `scripts/selfplay.py` (offline training harness). Trained tables saved to `models/`.
 - 🚧 **Phase 3 — Integration/QA:** ruff = 0 violations; coverage = 100% (≥85% gate); all files ≤150 lines; integration Steps 1–5 verified offline (engine + submodule `actor_loader`). **Remaining:** full `run_match.py --mode actor` smoke needs an LLM for NL messages — choose a backend per [`docs/LLM_BACKENDS.md`](LLM_BACKENDS.md) (Ollama, or OpenRouter via `scripts/openrouter_adapter.py`).
@@ -31,7 +31,7 @@
 
 | # | Task | Priority | Status | DoD |
 |---|------|----------|--------|-----|
-| 0.1 | Create `src/actor_t6/` package with `__init__.py` | P0 | Not Started | Package importable via `PYTHONPATH=../src` (see [PLAN §3 Modules](docs/PLAN.md#3-independent-modules)) |
+| 0.1 | Create `src/actor_brains/` package with `__init__.py` | P0 | Not Started | Package importable via `PYTHONPATH=../src` (see [PLAN §3 Modules](docs/PLAN.md#3-independent-modules)) |
 | 0.2 | Create `config/actor_config.json` with default weights | P0 | Not Started | JSON validates, all required keys present |
 | 0.3 | Create `config.py` — config loader with schema validation | P0 | Not Started | Returns defaults for missing keys, raises on invalid types (see [PLAN §6.1 Config Schema](docs/PLAN.md#61-actor-config-configactor_configjson)) |
 | 0.4 | Unit tests for `config` | P1 | Not Started | Test with invalid/missing keys, verify defaults (see [PLAN §3 Unit Test Strategy](docs/PLAN.md#3-independent-modules)) |
@@ -86,7 +86,7 @@
 | 3.4 | Integration Step 4 — QTableActor cold start | P0 | Not Started | Game completes, `.npy` files created (see [PLAN §4 Step 4](docs/PLAN.md#step-4--qtableactor-cold-start-no-training)) |
 | 3.5 | Integration Step 5 — QTableActor trained vs heuristic | P1 | Not Started | RL actor wins ≥ 50% of sub-games (see [PLAN §4 Step 5](docs/PLAN.md#step-5--qtableactor-trained-exploitation-mode)) |
 | 3.6 | Ruff lint — zero violations | P0 | Not Started | `ruff check src/` passes |
-| 3.7 | Full test suite — ≥ 85% coverage | P0 | Not Started | `pytest --cov=actor_t6` passes threshold |
+| 3.7 | Full test suite — ≥ 85% coverage | P0 | Not Started | `pytest --cov=actor_brains` passes threshold |
 
 **Milestone:** All 5 integration steps pass. Ready for submission.
 
@@ -101,11 +101,10 @@
 | 4.3 | Learning curve visualization | P2 | Not Started | Graph of win rate vs. training episodes |
 | 4.4 | README.md — scientific report | P1 | Not Started | DecPOMDP formalization, orchestration analysis, screenshots |
 
-**External blocker on 4.1/4.2:** both depend on the submodule implementing
-`view_radius` filtering (Chebyshev distance) in `get_state`, which is
-tracked in `agent-orchestration-course-t6-common/docs/TODO.md` Phase 14 as
-still open. Not something this repo can implement — the submodule is
-read-only (CLAUDE.md).
+**Current pinned submodule note:** `view_radius` filtering is present in
+`Game.get_state` for Cop observations. Phase 7 fixed the local belief lifecycle
+rule so a normal round 0 → round 1 progression no longer clears the last
+sighting.
 
 ---
 
@@ -118,8 +117,9 @@ outside this repo's scope (`docs/PRD.md` §1.5). Its own
 three assignment-level items still open there — listed here only as a
 pointer so a submission-readiness check doesn't miss them:
 
-- Partial observation (`view_radius` Chebyshev filtering in `get_state`) —
-  assignment §3. Blocks TODO 4.1/4.2 above.
+- Partial observation (`view_radius` Chebyshev filtering in `get_state`) is
+  present in the pinned submodule for Cop observations; broader assignment
+  hardening remains owned there.
 - Cloud deployment of both MCP servers with public URLs — assignment §8.
   Already flagged unchecked in `SUBMISSION_CHECKLIST.md`.
 - Bonus inter-group competition — assignment §12 (optional, +10).
@@ -136,6 +136,17 @@ None of these are actor-side work; they can't be closed from this repo.
 | 6.2 | Wire `.pre-commit-config.yaml` (11 hooks) + install locally | P1 | Done | `uv run pre-commit install` run; hooks fire on commit (verified live in PR [#3](https://github.com/evya1/AI-actor-game/pull/3)) |
 | 6.3 | Add keyless CI workflow (`.github/workflows/ci.yml`), PR/issue templates, `SUBMISSION_CHECKLIST.md` | P1 | Done | Workflow green on `main`; minimal `permissions: contents: read` |
 | 6.4 | Enable CI's gated pytest/coverage job via `SUBMODULE_SSH_KEY` repo secret | P2 | Not Started | Requires a read-only deploy key on `AmitKuper/agent-orchestration-course-t6-common`, added as a repo secret on `AI-actor-game`; blocked on submodule-repo admin access |
+
+## Phase 7: Correctness & Integration Remediation
+
+| # | Task | Priority | Status | DoD |
+|---|------|----------|--------|-----|
+| 7.1 | Correct RL terminal feedback delivery and legal-action Bellman targets | P0 | Done | `tests/test_selfplay_feedback.py`, `tests/test_qtable_bootstrap.py`, and full pre-commit pass |
+| 7.2 | Correct Cop capture dominance and belief-state lifecycle semantics | P0 | Done | `tests/test_heuristic_capture.py`, `tests/test_belief_state.py`, and full pre-commit pass |
+| 7.3 | Align peer-match proposal, auth loading, forfeit tolerance, and sync detection with canonical submodule behavior | P0 | Done | `tests/test_run_peer_match.py`, `tests/test_peer_sync.py`, and full pre-commit pass |
+| 7.4 | Harden launcher adapter configuration, readiness cleanup, and exit-status propagation | P0 | Done | `tests/test_launch_common.py`, `tests/test_launch_lifecycle.py`, `tests/test_run_stack.py`, and full pre-commit pass |
+| 7.5 | Retrain invalidated Q-table artifacts with deterministic settings | P0 | Done | `models/qtable_manifest.json` and `docs/QTABLE_RETRAINING_REPORT.md` record command, seed, hashes, and metrics |
+| 7.6 | Synchronize remediation documentation and prompt log | P1 | Done | `docs/CODE_REVIEW_REMEDIATION.md`, `PLAN`, `PRD`, `INTERFACES`, `PROMPTS`, README sync, and checklist updated |
 
 **Note:** GitHub issue/milestone-management tooling (`bootstrap_github_repo.py`, `sync_milestones.py`, `check_github_metadata.py`, `check_phase_order.py`) from the source integration package was deliberately **not** ported — only local repo-state quality gates are exposed in this public-facing repo. `config/milestones.json` is kept as plain declarative data (used by `check_docs_present.py`'s required-files gate).
 

@@ -51,11 +51,26 @@ reimplement here.
 
 ## Repo quality gates (this repo)
 
+- [x] Historical bonus-submission Git state preserved with annotated tag
+      `hw6-bonus-submission-v1` pointing to
+      `f8aef11193c9e7d26e5696e973411e881623a596`, the final first-parent commit
+      before `2026-07-03 00:00:00 +0300` (Asia/Jerusalem). Verify with
+      `git show --no-patch --format=fuller hw6-bonus-submission-v1` and
+      `git rev-list -n 1 hw6-bonus-submission-v1`. This tag preserves Git
+      state; it is not evidence that delivery email was sent.
 - [x] `uv run ruff check src tests scripts` → 0 violations.
-- [x] `uv run pytest --cov=actor_t6 --cov-fail-under=85` → green (needs submodule).
+- [x] `uv run pytest --cov=actor_brains --cov-fail-under=85` → green (needs submodule).
 - [x] `uv run python scripts/validate_repo.py` → OK.
 - [x] `uv run python scripts/check_markdown_links.py` → OK.
 - [x] `uv run python scripts/readme_sync.py check` → OK.
+- [x] Correctness remediation evidence recorded in
+      `docs/CODE_REVIEW_REMEDIATION.md` and model retraining evidence in
+      `docs/QTABLE_RETRAINING_REPORT.md`.
+- [x] Local end-to-end smoke passed (exit 0): OpenRouter backend, model
+      `deepseek/deepseek-v3.2`, `scripts/run_stack.py --backend openrouter local
+      --mode actor --seed 42` — adapter + both MCP servers start, health checks
+      pass, actor sub-games complete, children shut down cleanly. This is a
+      local integration smoke, not the official six-game session.
 - [x] 11-hook pre-commit suite wired and installed (`.pre-commit-config.yaml`,
       `uv run pre-commit install`); verified firing on a real commit
       (PR [#3](https://github.com/evya1/AI-actor-game/pull/3)).
@@ -66,4 +81,5 @@ reimplement here.
       repo secret (needs a read-only deploy key on the submodule repo;
       see `docs/TODO.md` task 6.4).
 - [ ] CI green on the submission commit (re-check at submission time).
-- [x] AI-usage disclosure present (`docs/PROMPTS.md` / AI usage section).
+- [x] AI-usage disclosure present (`docs/PROMPTS.md` and
+      `docs/AI_USAGE_AND_COST.md`).

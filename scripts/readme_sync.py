@@ -45,9 +45,9 @@ def _test_count() -> str:
 
 
 def _module_table() -> str:
-    """Line-count inventory of src/actor_t6 modules (150-line rule evidence)."""
+    """Line-count inventory of src/actor_brains modules (150-line rule evidence)."""
     rows = ["| Module | Lines |", "|--------|-------|"]
-    for p in sorted((ROOT / "src" / "actor_t6").rglob("*.py")):
+    for p in sorted((ROOT / "src" / "actor_brains").rglob("*.py")):
         n = len(p.read_text(encoding="utf-8").splitlines())
         rows.append(f"| `{p.relative_to(ROOT / 'src')}` | {n} |")
     return "\n".join(rows)
