@@ -9,6 +9,7 @@ only job is the actors** — the logic that decides each move.
 
 > New here? Read this file top-to-bottom, then `docs/PRD.md` (requirements),
 > `docs/PLAN.md` (architecture/ADRs), and `docs/INTERFACES.md` (class contracts).
+> The full course assignment brief is in `docs/EX06_ASSIGNMENT.md`.
 > LLM setup for live matches is in `docs/LLM_BACKENDS.md`.
 
 ---
