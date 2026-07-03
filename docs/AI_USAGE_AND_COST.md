@@ -20,9 +20,10 @@ should be inferred without a verified billing model.
 | Branch | `fix/correctness-and-integration-review` |
 | Original base | `af1c2442fdb3e0ebc8872c7c728d3f72d871a48e` |
 | Reported resulting head | `35f3a54` |
-| Model | Sonnet 5, per prompt log; exact provider model identifier not independently verified |
+| Model | Codex `gpt-5.5` (verified from the session transcript token metadata). The prompt log's "Sonnet 5" reflected requested effort style, not the execution engine. |
 | Effort | Not independently verified |
-| Execution environment | Claude Code |
+| Execution environment | Codex CLI (`codex-tui` 0.141.0), OpenAI provider |
+| Session transcript | `~/.codex/sessions/2026/07/03/rollout-…019f28ca….jsonl` |
 
 | Category | Tokens |
 |---|---:|
@@ -51,26 +52,28 @@ tokens may already be included in provider output-token accounting.
 
 | Field | Value |
 |---|---|
-| Start time | 2026-07-03, Asia/Jerusalem |
-| Completion time | Not reported by the execution environment |
-| Model | Sonnet with low coordinator effort, requested by user; exact provider model identifier not independently verified |
+| Start time | 2026-07-03T16:52 UTC, Asia/Jerusalem |
+| Model | Codex `gpt-5.5` (verified from the session transcript). The prompt requested "Sonnet with low coordinator effort," but the session executed on Codex `gpt-5.5`. |
 | Effort level | Low coordinator effort requested; focused agents used for read-only audits |
 | Branch | `fix/correctness-and-integration-review` |
 | Base | `af1c2442fdb3e0ebc8872c7c728d3f72d871a48e` |
-| Final head | Not reported by the execution environment at document creation time |
 | Prompt reference | `docs/PROMPTS.md`, 2026-07-03 release-verification entry |
-| Input tokens | Not reported by the execution environment |
-| Cached-input tokens | Not reported by the execution environment |
-| Output tokens | Not reported by the execution environment |
-| Reasoning tokens | Not reported by the execution environment |
-| Reported total | Not reported by the execution environment |
-| Duration | Not reported by the execution environment |
-| Focused agents | 3 |
-| Commits added | Not reported by the execution environment at document creation time |
-| Tests executed | Recorded in final release report and Git history |
-| Final result | Not reported by the execution environment at document creation time |
+| Execution environment | Codex CLI, OpenAI provider |
+| Session transcript | `~/.codex/sessions/2026/07/03/rollout-…019f28e5….jsonl` |
+| Non-cached input tokens | 237,728 |
+| Cached-input tokens | 5,013,632 |
+| Output tokens | 28,330 |
+| Reasoning tokens | 2,673 |
+| Reported non-cached total | 266,058 |
 
-Unavailable usage values are intentionally not estimated from transcript length.
+Arithmetic note: `237,728 input + 28,330 output = 266,058 reported total`; the
+transcript's cumulative `input_tokens` (5,251,360) includes the 5,013,632 cached
+tokens, which are tracked separately and not added into the reported total.
+
+Source: final cumulative `total_token_usage` record in the Codex rollout
+transcript. Cost status: not calculated — the transcript records no monetary
+cost (plan-metered Codex session); no dollar value is estimated without verified
+rates.
 
 ## Run 3 -- Final Release, Smoke Fix, and PR
 
@@ -111,20 +114,71 @@ per-token API billing, so no per-session monetary cost is recorded. No dollar
 value is estimated without a verified billing model and rates. If run under API
 billing, apply the Cost Calculation Template below to these token counts.
 
+## Run F -- Fable Code Review (Claude)
+
+| Field | Value |
+|---|---|
+| Start time | 2026-07-03T14:54, Asia/Jerusalem |
+| Purpose | Rigorous read-only `fluent-python-review` (high effort) of the actor code — the "Fable review" whose findings drove Run 1 remediation |
+| Model | `claude-fable-5` (verified from the session transcript) |
+| Execution environment | Claude Code |
+| Session transcript | `~/.claude/projects/-home-dev-pop-os-hw6-actors/31e045cf….jsonl` |
+| Non-cached input tokens | 52,313 |
+| Cache-creation input tokens | 558,915 |
+| Cache-read input tokens | 5,606,687 |
+| Output tokens | 169,025 |
+| Reasoning tokens | Not separately reported in the usage records |
+| Reported total (input + output) | 221,338 |
+
+Source: summed per-message `message.usage` records from the session transcript.
+Cost status: not calculated — subscription (plan-metered) session with no
+`costUSD` recorded.
+
+## Codex Sessions -- Full Repository Accounting
+
+All Codex work for this assignment ran on `2026-07-03` in `cwd`
+`/home/dev-pop-os/hw6-actors`, model `gpt-5.5` (some spawned agents report
+`codex-auto-review`). Runs 1 and 2 above are two of these sessions; the
+remainder are review / auto-review / focused-agent sessions. Figures are the
+final cumulative `total_token_usage` per rollout transcript. `input` includes
+cached tokens; the last column is `total_tokens` (`input + output`).
+
+| Session (rollout id) | Role | Input (incl. cached) | Cached | Output | Reasoning | Total |
+|---|---|---:|---:|---:|---:|---:|
+| `019f28ca` | Run 1 — correctness remediation | 15,183,558 | 14,971,648 | 47,354 | 5,896 | 15,230,912 |
+| `019f28cc` | auto-review agent | 539,684 | 460,032 | 1,290 | 491 | 540,974 |
+| `019f28cd-6291` | review agent | 235,105 | 160,384 | 3,818 | 125 | 238,923 |
+| `019f28cd-7757` | review agent | 284,536 | 220,800 | 3,634 | 86 | 288,170 |
+| `019f28cd-8a3b` | review agent | 142,380 | 95,616 | 2,803 | 307 | 145,183 |
+| `019f28cd-9f11` | review agent | 279,606 | 231,808 | 4,446 | 481 | 284,052 |
+| `019f28e5` | Run 2 — release/submission | 5,251,360 | 5,013,632 | 28,330 | 2,673 | 5,279,690 |
+| `019f28f1-53f2` | review agent | 455,249 | 346,880 | 4,706 | 519 | 459,955 |
+| `019f28f1-6612` | review agent | 246,705 | 201,344 | 2,968 | 258 | 249,673 |
+| `019f28f1-8099` | review agent | 616,782 | 529,536 | 4,875 | 598 | 621,657 |
+| `019f28f2-71b6` | auto-review agent | 39,950 | 26,368 | 206 | 170 | 40,156 |
+| `019f28f2-f1cd` | auto-review agent | 102,741 | 74,112 | 386 | 243 | 103,127 |
+| **Codex total (12 sessions)** | | **23,377,656** | **22,332,160** | **104,816** | **11,847** | **23,482,472** |
+
+Non-cached input across all Codex sessions: `23,377,656 − 22,332,160 =
+1,045,496`. Cost status: not calculated — Codex transcripts record no monetary
+cost (plan-metered); no dollar value is estimated without verified rates.
+
 ## Run Comparison
 
-| Metric | Run 1 | Run 2 | Run 3 (snapshot) |
-|---|---:|---:|---:|
-| Non-cached input | 211,910 | Not reported | 28,125 |
-| Cached input | 14,971,648 | Not reported | 27,484,648 |
-| Output | 47,354 | Not reported | 253,166 |
-| Reasoning | 5,896 | Not reported | Not separately reported |
-| Reported total | 259,264 | Not reported | 281,291 |
+| Metric | Run 1 (Codex) | Run 2 (Codex) | Run F (Fable) | Run 3 (Opus, snapshot) |
+|---|---:|---:|---:|---:|
+| Non-cached input | 211,910 | 237,728 | 52,313 | 28,125 |
+| Cached input | 14,971,648 | 5,013,632 | 6,165,602 | 27,484,648 |
+| Output | 47,354 | 28,330 | 169,025 | 253,166 |
+| Reasoning | 5,896 | 2,673 | Not sep. reported | Not sep. reported |
+| Reported total (in+out) | 259,264 | 266,058 | 221,338 | 281,291 |
 
-Run 3 cached input is `cache_creation (800,673) + cache_read (26,683,975)`.
-No cost delta is calculated: Run 2 token metadata was unavailable, and Run 1/Run 3
-were subscription (plan-metered) sessions with no per-token dollar cost recorded;
-exact billing rates were not verified.
+Cached input aggregates cache-creation + cache-read where the source separates
+them (Run F: `558,915 + 5,606,687`; Run 3: `800,673 + 26,683,975`). No monetary
+cost delta is calculated: every session above was subscription/plan-metered
+(Claude Max plan for Fable/Opus; Codex plan for Runs 1–2) with no per-token
+dollar cost recorded in any transcript, and exact billing rates were not
+verified.
 
 ## Efficiency Observations
 
@@ -183,5 +237,17 @@ Date recorded: 2026-07-03.
 Repository commit that introduced this documentation: see the follow-up release
 documentation commit in Git history.
 
-Independent-verification status: No -- preserved from the execution summary
-supplied by the user.
+Independent-verification status: **Yes (updated 2026-07-03).** Runs 1, 2, F, and
+all Codex sessions were reconciled against on-disk session transcripts:
+
+- Codex: final cumulative `total_token_usage` in
+  `~/.codex/sessions/2026/07/03/rollout-*.jsonl` (filtered to `cwd`
+  `/home/dev-pop-os/hw6-actors`). Run 1 = `019f28ca`, Run 2 = `019f28e5`.
+- Claude: summed per-message `message.usage` in
+  `~/.claude/projects/-home-dev-pop-os-hw6-actors/*.jsonl`. Run F (Fable) =
+  `31e045cf`; Run 3 (Opus) = `3810214b` + `701a28fc`.
+
+The token figures agree with the previously user-supplied summaries. No
+transcript records a monetary cost field (`costUSD`), consistent with
+subscription/plan-metered sessions; monetary cost is therefore not calculated.
+Run 3 remains a mid-session snapshot and will grow while active.
