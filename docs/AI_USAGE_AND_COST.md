@@ -72,18 +72,46 @@ tokens may already be included in provider output-token accounting.
 
 Unavailable usage values are intentionally not estimated from transcript length.
 
+## Run 3 -- Final Release, Smoke Fix, and PR
+
+| Field | Value |
+|---|---|
+| Start time | 2026-07-03, Asia/Jerusalem |
+| Purpose | Final release verification, OpenRouter local end-to-end smoke, launcher-defect fix, README sample-run preview, PR/CI |
+| Prompt reference | `docs/PROMPTS.md`, 2026-07-03 final-release/smoke/PR entry |
+| Repository | `https://github.com/evya1/AI-actor-game` |
+| Branch | `fix/correctness-and-integration-review` |
+| Base head at start | `7d9ee22` |
+| Final head | `30709f6` |
+| Model | Opus 4.8, per user selection; exact provider model identifier not independently verified |
+| Effort level | Low, per user selection |
+| Execution environment | Claude Code |
+| Commits added | 3 (`da71883` launcher fix + test, `2588d8d` docs, `30709f6` README sample run) |
+| Pull request | [#8](https://github.com/evya1/AI-actor-game/pull/8), CI green, mergeable |
+| Local smoke | OpenRouter, `deepseek/deepseek-v3.2`, seed 42 — exit 0 |
+| Input tokens | Not reported by the execution environment |
+| Cached-input tokens | Not reported by the execution environment |
+| Output tokens | Not reported by the execution environment |
+| Reasoning tokens | Not reported by the execution environment |
+| Reported total | Not reported by the execution environment |
+
+Cost status: Not calculated -- token metadata was not surfaced by the execution
+environment, and exact billing rates were not verified. Unavailable usage values
+are intentionally not estimated from transcript length. If the execution
+summary is supplied later, record the exact reported line here as for Run 1.
+
 ## Run Comparison
 
-| Metric | Run 1 | Run 2 |
-|---|---:|---:|
-| Non-cached input | 211,910 | Not reported |
-| Cached input | 14,971,648 | Not reported |
-| Output | 47,354 | Not reported |
-| Reasoning | 5,896 | Not reported |
-| Reported total | 259,264 | Not reported |
+| Metric | Run 1 | Run 2 | Run 3 |
+|---|---:|---:|---:|
+| Non-cached input | 211,910 | Not reported | Not reported |
+| Cached input | 14,971,648 | Not reported | Not reported |
+| Output | 47,354 | Not reported | Not reported |
+| Reasoning | 5,896 | Not reported | Not reported |
+| Reported total | 259,264 | Not reported | Not reported |
 
-No cost or efficiency delta is calculated because Run 2 token metadata and exact
-billing rates were not verified.
+No cost or efficiency delta is calculated because Run 2 and Run 3 token metadata
+and exact billing rates were not verified.
 
 ## Efficiency Observations
 
