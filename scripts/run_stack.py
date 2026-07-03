@@ -56,18 +56,19 @@ def _server_env(opponent_url: str, my_role: str, actor_class: str) -> dict:
     }
 
 
-def run_local(extra: list[str], cfg: dict, needs_adapter: bool) -> None:
+def run_local(extra: list[str], cfg: dict, needs_adapter: bool) -> int:
     """Start the adapter (if needed) and run the submodule run_match.py."""
     adapter = launch_common.start_adapter(cfg) if needs_adapter else None
     try:
         script = launch_common.SUBMODULE_ROOT / "scripts" / "run_match.py"
-        subprocess.run(launch_common.submodule_cmd(["python", str(script), *extra]),
-                       cwd=str(launch_common.REPO_ROOT), check=False)
+        result = subprocess.run(launch_common.submodule_cmd(["python", str(script), *extra]),
+                                cwd=str(launch_common.REPO_ROOT), check=False)
+        return int(result.returncode)
     finally:
         launch_common.stop_process(adapter, "adapter")
 
 
-def run_cross_team(args: argparse.Namespace, cfg: dict, needs_adapter: bool) -> None:
+def run_cross_team(args: argparse.Namespace, cfg: dict, needs_adapter: bool) -> int:
     """Start the adapter + own server, then drive the local side vs a remote peer."""
     adapter = launch_common.start_adapter(cfg) if needs_adapter else None
     server: subprocess.Popen | None = None
@@ -80,10 +81,10 @@ def run_cross_team(args: argparse.Namespace, cfg: dict, needs_adapter: bool) -> 
             cwd=str(launch_common.REPO_ROOT),
         )
         launch_common.wait_for_port(cfg["adapter_host"], args.port,
-                                    float(cfg["adapter_ready_timeout"]))
+                                    float(cfg["adapter_ready_timeout"]), server)
         print(f"[run_stack] local server up on port {args.port}")  # noqa: T201
         peer = launch_common.REPO_ROOT / "scripts" / "run_peer_match.py"
-        subprocess.run(
+        result = subprocess.run(
             launch_common.submodule_cmd(
                 ["python", str(peer), "--local-url", f"http://localhost:{args.port}",
                  "--my-role", args.my_role, "--game-id", args.game_id,
@@ -91,6 +92,7 @@ def run_cross_team(args: argparse.Namespace, cfg: dict, needs_adapter: bool) -> 
                  "--max-rounds", str(args.max_rounds), "--turn-timeout", str(args.turn_timeout)]),
             cwd=str(launch_common.REPO_ROOT), env=os.environ.copy(), check=False,
         )
+        return int(result.returncode)
     finally:
         launch_common.stop_process(server, "server")
         launch_common.stop_process(adapter, "adapter")
@@ -116,7 +118,7 @@ def _build_parser(cfg: dict) -> argparse.ArgumentParser:
     return parser
 
 
-def main() -> None:
+def main() -> int:
     """Resolve the backend and dispatch to the requested launch mode."""
     launch_common.load_env()
     cfg = launch_common.launcher_config()
@@ -125,10 +127,9 @@ def main() -> None:
     needs_adapter = backend == "openrouter"
     print(f"[run_stack] backend={backend} adapter={'yes' if needs_adapter else 'no'}")  # noqa: T201
     if args.command == "local":
-        run_local(extra, cfg, needs_adapter)
-    else:
-        run_cross_team(args, cfg, needs_adapter)
+        return run_local(extra, cfg, needs_adapter)
+    return run_cross_team(args, cfg, needs_adapter)
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

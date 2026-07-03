@@ -109,9 +109,10 @@ class _Handler(BaseHTTPRequestHandler):
 def main() -> None:
     """Start the adapter server on ADAPTER_PORT until interrupted."""
     port = int(os.environ.get("ADAPTER_PORT", _DEFAULT_PORT))
-    server = ThreadingHTTPServer(("127.0.0.1", port), _Handler)
+    host = os.environ.get("ADAPTER_HOST", "127.0.0.1")
+    server = ThreadingHTTPServer((host, port), _Handler)
     model_hint = os.environ.get("LLM_MODEL", "<set LLM_MODEL to an OpenRouter id>")
-    print(f"[openrouter-adapter] listening on http://localhost:{port}/api/chat")  # noqa: T201
+    print(f"[openrouter-adapter] listening on http://{host}:{port}/api/chat")  # noqa: T201
     print(f"[openrouter-adapter] point OLLAMA_BASE_URL at it; LLM_MODEL={model_hint}")  # noqa: T201
     try:
         server.serve_forever()

@@ -87,6 +87,7 @@ class _FakeProc:
         self._alive = alive
         self.terminated = False
         self.waited = False
+        self.killed = False
 
     def poll(self):
         return None if self._alive else 0
@@ -95,16 +96,24 @@ class _FakeProc:
         self.terminated = True
         self._alive = False
 
-    def wait(self):
+    def wait(self, timeout=None):
         self.waited = True
+
+    def kill(self):
+        self.killed = True
+        self._alive = False
 
 
 def test_start_adapter_launches_and_waits(monkeypatch):
     fake = _FakeProc()
-    monkeypatch.setattr(lc.subprocess, "Popen", lambda *a, **k: fake)
+    seen = {}
+    monkeypatch.setattr(lc.subprocess, "Popen",
+                        lambda *a, **k: seen.setdefault("env", k["env"]) and fake)
     monkeypatch.setattr(lc, "wait_for_port", lambda *a, **k: None)
     cfg = lc.launcher_config()
     assert lc.start_adapter(cfg) is fake
+    assert seen["env"]["ADAPTER_PORT"] == str(cfg["adapter_port"])
+    assert seen["env"]["OLLAMA_BASE_URL"].endswith(f":{cfg['adapter_port']}")
 
 
 def test_stop_process_terminates_running():

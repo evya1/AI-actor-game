@@ -103,7 +103,8 @@ def select_backend(choice: str, env: dict) -> str:
     return "ollama"
 
 
-def wait_for_port(host: str, port: int, timeout: float) -> None:
+def wait_for_port(host: str, port: int, timeout: float,
+                  proc: subprocess.Popen | None = None) -> None:
     """Block until a TCP connection to host:port succeeds or timeout elapses.
 
     A socket probe is used (not HTTP) so a readiness check never triggers a real
@@ -113,12 +114,15 @@ def wait_for_port(host: str, port: int, timeout: float) -> None:
         host: Target host.
         port: Target port.
         timeout: Maximum seconds to wait.
+        proc: Optional subprocess that must stay alive during readiness.
 
     Raises:
         RuntimeError: If the port is not accepting connections in time.
     """
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
+        if proc is not None and proc.poll() is not None:
+            raise RuntimeError(f"process exited before {host}:{port} became reachable")
         try:
             with socket.create_connection((host, port), timeout=2.0):
                 return
@@ -130,10 +134,17 @@ def wait_for_port(host: str, port: int, timeout: float) -> None:
 def start_adapter(cfg: dict) -> subprocess.Popen:
     """Start the (stdlib-only) OpenRouter adapter and wait until it is ready."""
     script = str(REPO_ROOT / cfg["adapter_script"])
-    proc = subprocess.Popen([sys.executable, script], cwd=str(REPO_ROOT))
+    env = {**os.environ, "ADAPTER_HOST": str(cfg["adapter_host"]),
+           "ADAPTER_PORT": str(cfg["adapter_port"])}
+    env["OLLAMA_BASE_URL"] = f"http://{cfg['adapter_host']}:{cfg['adapter_port']}"
+    proc = subprocess.Popen([sys.executable, script], cwd=str(REPO_ROOT), env=env)
     print(f"[run_stack] starting OpenRouter adapter (pid {proc.pid})")  # noqa: T201
-    wait_for_port(cfg["adapter_host"], int(cfg["adapter_port"]),
-                  float(cfg["adapter_ready_timeout"]))
+    try:
+        wait_for_port(cfg["adapter_host"], int(cfg["adapter_port"]),
+                      float(cfg["adapter_ready_timeout"]), proc)
+    except Exception:
+        stop_process(proc, "adapter")
+        raise
     print(f"[run_stack] adapter ready on {cfg['adapter_host']}:{cfg['adapter_port']}")  # noqa: T201
     return proc
 
@@ -143,5 +154,9 @@ def stop_process(proc: subprocess.Popen | None, label: str) -> None:
     if proc is None or proc.poll() is not None:
         return
     proc.terminate()
-    proc.wait()
+    try:
+        proc.wait(timeout=5)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        proc.wait(timeout=5)
     print(f"[run_stack] {label} stopped")  # noqa: T201
