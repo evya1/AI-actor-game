@@ -29,7 +29,6 @@ if TYPE_CHECKING:
 ACTIONS: list[str] = [*DIRECTIONS, BARRIER_ACTION, STAY_ACTION]
 _ACTION_INDEX: dict[str, int] = {a: i for i, a in enumerate(ACTIONS)}
 
-
 class QTableActor(BaseActor):
     """Epsilon-greedy tabular Q-learning actor for both roles."""
 
@@ -75,8 +74,10 @@ class QTableActor(BaseActor):
             An action string from ``obs.legal_moves``.
         """
         state = StateEncoder.encode(obs, self._grid)
+        if not obs.legal_moves:
+            raise ValueError("QTableActor requires at least one legal move")
         if self._pending is not None:
-            self._bellman_bootstrap(state)
+            self._bellman_bootstrap(state, obs.legal_moves)
         if self._rng.random() < self._epsilon:
             chosen = obs.legal_moves[self._rng.integers(len(obs.legal_moves))]
         else:
@@ -104,10 +105,13 @@ class QTableActor(BaseActor):
         else:
             self._pending = (state, act_idx, reward)
 
-    def _bellman_bootstrap(self, next_state: int) -> None:
+    def _bellman_bootstrap(self, next_state: int, legal_moves: list[str]) -> None:
         """Apply Q(s,a) += α·(r + γ·max Q(s') − Q(s,a)) for the pending step."""
+        if not legal_moves:
+            raise ValueError("cannot bootstrap without legal moves")
         state, act_idx, reward = self._pending
-        target = reward + self._gamma * float(self.q_table[next_state].max())
+        legal_indices = [_ACTION_INDEX[action] for action in legal_moves]
+        target = reward + self._gamma * float(self.q_table[next_state, legal_indices].max())
         self.q_table[state, act_idx] += self._alpha * (target - self.q_table[state, act_idx])
         self._pending = None
 
