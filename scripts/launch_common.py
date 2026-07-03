@@ -134,9 +134,13 @@ def wait_for_port(host: str, port: int, timeout: float,
 def start_adapter(cfg: dict) -> subprocess.Popen:
     """Start the (stdlib-only) OpenRouter adapter and wait until it is ready."""
     script = str(REPO_ROOT / cfg["adapter_script"])
+    # The Gatekeeper runs inside the separately-spawned run_match / MCP-server
+    # processes, which inherit *this* process's environment. Publish the adapter
+    # URL to os.environ (not just the adapter's own env) so those downstream
+    # processes actually dial the adapter instead of the default Ollama port.
+    os.environ["OLLAMA_BASE_URL"] = f"http://{cfg['adapter_host']}:{cfg['adapter_port']}"
     env = {**os.environ, "ADAPTER_HOST": str(cfg["adapter_host"]),
            "ADAPTER_PORT": str(cfg["adapter_port"])}
-    env["OLLAMA_BASE_URL"] = f"http://{cfg['adapter_host']}:{cfg['adapter_port']}"
     proc = subprocess.Popen([sys.executable, script], cwd=str(REPO_ROOT), env=env)
     print(f"[run_stack] starting OpenRouter adapter (pid {proc.pid})")  # noqa: T201
     try:

@@ -7,6 +7,7 @@ processes (Popen is monkeypatched).
 
 from __future__ import annotations
 
+import os
 import socket
 import sys
 from pathlib import Path
@@ -110,10 +111,16 @@ def test_start_adapter_launches_and_waits(monkeypatch):
     monkeypatch.setattr(lc.subprocess, "Popen",
                         lambda *a, **k: seen.setdefault("env", k["env"]) and fake)
     monkeypatch.setattr(lc, "wait_for_port", lambda *a, **k: None)
+    # Track OLLAMA_BASE_URL via monkeypatch so start_adapter's os.environ write
+    # is restored after the test instead of leaking into other tests.
+    monkeypatch.setenv("OLLAMA_BASE_URL", "http://placeholder:0")
     cfg = lc.launcher_config()
     assert lc.start_adapter(cfg) is fake
     assert seen["env"]["ADAPTER_PORT"] == str(cfg["adapter_port"])
     assert seen["env"]["OLLAMA_BASE_URL"].endswith(f":{cfg['adapter_port']}")
+    # The gatekeeper inherits os.environ from downstream subprocesses, so the
+    # adapter URL must be published there, not only on the adapter's own env.
+    assert os.environ["OLLAMA_BASE_URL"].endswith(f":{cfg['adapter_port']}")
 
 
 def test_stop_process_terminates_running():
