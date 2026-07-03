@@ -23,17 +23,14 @@ follow the Interface Change Protocol in CLAUDE.md §0.
 ## Milestone and labels
 
 - **Milestone**: <from `config/milestones.json`>
-- **Labels**: <from the vocabulary in `scripts/check_github_metadata.py`:
-  `docs`, `architecture`, `rl`, `heuristic`, `mcp`, `launcher`,
-  `llm-backend`, `testing`, `reporting`, `deployment`, `submission`,
-  `security`, `decision`>
+- **Labels**: <from the vocabulary: `docs`, `architecture`, `rl`,
+  `heuristic`, `mcp`, `launcher`, `llm-backend`, `testing`, `reporting`,
+  `deployment`, `submission`, `security`, `decision`>
 
 ## Dependencies
 
 - **Depends on**: <task ID / issue #, or "none">
 - **Blocks**: <task ID / issue #, or "none">
-
-Validate metadata: `uv run python scripts/check_github_metadata.py --issue <N>`
 
 ## Description
 
