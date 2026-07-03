@@ -18,12 +18,9 @@ _ARCHIVE_SUFFIXES = (
     ".tar.xz", ".zip", ".gz", ".bz2", ".xz",
 )
 
-# Deliberately tracked archives. NOTE: .agents/ai-orchestration-skills.zip
-# duplicates the extracted .agents/skills/ tree — consider untracking the
-# zip and removing this entry.
-_ALLOWED = {
-    ".agents/ai-orchestration-skills.zip",
-}
+# Deliberately tracked archives. Empty for now — keep this allowlist for
+# any future archive that legitimately needs to stay in git.
+_ALLOWED: set[str] = set()
 
 
 def _tracked_files() -> list[str]:

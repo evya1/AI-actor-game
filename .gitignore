@@ -230,3 +230,7 @@ games/
 # partner can load without retraining. Do not ignore models/.
 #
 # .env, .venv, and __pycache__ are already ignored in the sections above.
+
+# Untracked source archive — content lives extracted at .agents/skills/;
+# the zip itself was dropped from git (see scripts/check_source_archives.py):
+.agents/ai-orchestration-skills.zip
