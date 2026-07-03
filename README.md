@@ -245,7 +245,19 @@ xychart-beta
 
 OpenRouter routes across ~11 providers at ~5× price spread (Baidu ~$0.000019 →
 Google ~$0.000098 per call); the figures above are the blended rate actually paid.
-Full multi-engine token/cost accounting (Claude, Codex, OpenRouter) is in
+
+**Why it's this cheap:** the actor decides every move deterministically (Q-table
+at ε=0, or the heuristic) — the LLM is called only to *narrate* the chosen move,
+so completions are ~15–20 tokens. Swap in a local Ollama model and the per-match
+cost drops to **$0**. At scale a full official series is ~1.2¢, so **1,000
+series ≈ $12** of narration.
+
+**Development-cost transparency.** This repo was built with AI assistance
+(Claude Code + Codex). The **only real metered spend on the whole project was
+$0.0082** (the OpenRouter smoke above) — every coding/agent session ran under a
+flat subscription/plan with no per-token charge. The complete, transcript-verified
+token accounting across all engines (Claude, Codex, OpenRouter), plus an
+illustrative "if it had been API-metered" estimate, lives in
 [`docs/AI_USAGE_AND_COST.md`](docs/AI_USAGE_AND_COST.md).
 
 ---

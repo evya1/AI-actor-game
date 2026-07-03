@@ -285,6 +285,31 @@ Recommended future improvements:
 
 These are process recommendations, not measured token savings.
 
+## Illustrative List-Price Cost (hypothetical -- NOT billed)
+
+**These figures were never charged.** All Claude and Codex agent sessions ran
+under subscription/plan billing with no per-token cost (see above); the only
+metered spend is the OpenRouter smoke test (**$0.008212**). The estimates below
+answer a *what-if*: had the Claude sessions run under metered **Anthropic API
+list pricing**, applying cache-read at 0.1x input and cache-write at 1.25x
+input. They are for scale intuition only and are not a real invoice.
+
+Rates used (per 1M tokens, list price): Opus 4.8 = $5 in / $25 out; Fable 5 =
+$10 in / $50 out.
+
+| Run | Model | Non-cached in | Cache-write | Cache-read | Output | Illustrative total |
+|---|---|---:|---:|---:|---:|---:|
+| Run 3 | Opus 4.8 | $0.36 | $9.97 | $42.20 | $15.87 | **~$68.41** |
+| Run F | Fable 5 | $0.52 | $6.99 | $5.61 | $8.45 | **~$21.57** |
+| **Claude runs combined** | | | | | | **~$89.98** |
+
+Cache-read dominates Run 3 (84.4M cache-read tokens x 0.1 x $5/M = $42.20) --
+the large context re-read each turn. **Runs 1-2 (Codex `gpt-5.5`) are omitted:**
+they are OpenAI models and no verified published GPT-5.5 rate was available, so
+computing a figure would be fabrication.
+
+Actually-billed total across the whole project: **$0.008212** (OpenRouter only).
+
 ## Cost Calculation Template
 
 ```text
