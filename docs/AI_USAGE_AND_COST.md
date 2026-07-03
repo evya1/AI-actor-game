@@ -89,19 +89,19 @@ rates.
 | Repository | `https://github.com/evya1/AI-actor-game` |
 | Branch | `fix/correctness-and-integration-review` |
 | Base head at start | `7d9ee22` |
-| Final head | `30709f6` |
+| Final head | `1cf9878` |
 | Model | Opus 4.8, per user selection; exact provider model identifier not independently verified |
 | Effort level | Low, per user selection |
 | Execution environment | Claude Code |
-| Commits added | 3 (`da71883` launcher fix + test, `2588d8d` docs, `30709f6` README sample run) |
+| Commits added | 10 (`da71883` … `1cf9878`): launcher `OLLAMA_BASE_URL` fix, cost/usage accounting, professional README overhaul, and the `actor_t6 → actor_brains` package rename |
 | Pull request | [#8](https://github.com/evya1/AI-actor-game/pull/8), CI green, mergeable |
 | Local smoke | OpenRouter, `deepseek/deepseek-v3.2`, seed 42 — exit 0 |
-| Non-cached input tokens | 28,125 |
-| Output tokens | 253,166 |
-| Cache-creation input tokens | 800,673 |
-| Cache-read input tokens | 26,683,975 |
+| Non-cached input tokens | 72,814 |
+| Output tokens | 634,833 |
+| Cache-creation input tokens | 1,594,974 |
+| Cache-read input tokens | 84,408,487 |
 | Reasoning tokens | Not separately reported in the usage records |
-| Reported total (input + output) | 281,291 |
+| Reported total (input + output) | 707,647 |
 
 Source: summed per-message `message.usage` records from this session's local
 Claude Code transcripts (`~/.claude/projects/-home-dev-pop-os-hw6-actors/`,
@@ -110,7 +110,7 @@ figures are a snapshot captured mid-session and continue to grow while the
 conversation is active; cache-read/cache-creation tokens are tracked separately
 and are not added into the reported total.
 
-Arithmetic note: `28,125 input + 253,166 output = 281,291 reported total`.
+Arithmetic note: `72,814 input + 634,833 output = 707,647 reported total`.
 
 Cost status: Not calculated -- the local transcripts contain no `costUSD`
 field, which indicates a subscription (plan-metered) session rather than
@@ -225,8 +225,8 @@ June 25--26 build/exploration, the 2026-07-03 planning, the Fable review
 | `17696d69` | 07-03 | sonnet-5 | planning / quality-gates | 56,871 | 74,991,333 | 264,045 | 320,916 |
 | `31e045cf` | 07-03 | fable-5 | **Run F** — Fable review | 52,313 | 6,165,602 | 169,025 | 221,338 |
 | `3810214b` | 07-03 | opus-4-8 | **Run 3** — release/smoke/PR | 11,657 | 6,793,421 | 81,096 | 92,753 |
-| `701a28fc` | 07-03 | opus-4-8 | **Run 3** — release/smoke/PR (cont.) | 17,747 | 30,211,453 | 260,214 | 277,961 |
-| **Claude total (11 sessions)** | | | | **368,590** | **277,293,097** | **2,304,478** | **2,673,068** |
+| `701a28fc` | 07-03 | opus-4-8 | **Run 3** — release/smoke/PR (cont.) | 61,157 | 79,210,040 | 553,737 | 614,894 |
+| **Claude total (11 sessions)** | | | | **412,000** | **326,291,684** | **2,598,001** | **3,010,001** |
 
 Run 3 spans two transcripts and is a live snapshot that keeps growing while the
 session is active. The build sessions (June + the 07-03 planning session) were
@@ -237,12 +237,12 @@ complete project-wide picture.
 
 | Engine | Sessions | Non-cached input | Output | Non-cached in+out |
 |---|---:|---:|---:|---:|
-| Claude (this project) | 11 | 368,590 | 2,304,478 | 2,673,068 |
+| Claude (this project) | 11 | 412,000 | 2,598,001 | 3,010,001 |
 | Codex (this project) | 12 | 1,045,496 | 104,816 | 1,150,312 |
-| **Combined** | **23** | **1,414,086** | **2,409,294** | **3,823,380** |
+| **Combined** | **23** | **1,457,496** | **2,702,817** | **4,160,313** |
 
 Cached-input tokens are large and tracked separately per engine (Claude
-277,293,097; Codex 22,332,160) and are not added into the non-cached in+out
+326,291,684; Codex 22,332,160) and are not added into the non-cached in+out
 total. Cost status: not calculated — no Claude or Codex transcript records a
 `costUSD` field; all sessions were subscription/plan-metered. No dollar value is
 estimated without verified rates.
@@ -251,14 +251,14 @@ estimated without verified rates.
 
 | Metric | Run 1 (Codex) | Run 2 (Codex) | Run F (Fable) | Run 3 (Opus, snapshot) |
 |---|---:|---:|---:|---:|
-| Non-cached input | 211,910 | 237,728 | 52,313 | 28,125 |
-| Cached input | 14,971,648 | 5,013,632 | 6,165,602 | 27,484,648 |
-| Output | 47,354 | 28,330 | 169,025 | 253,166 |
+| Non-cached input | 211,910 | 237,728 | 52,313 | 72,814 |
+| Cached input | 14,971,648 | 5,013,632 | 6,165,602 | 86,003,461 |
+| Output | 47,354 | 28,330 | 169,025 | 634,833 |
 | Reasoning | 5,896 | 2,673 | Not sep. reported | Not sep. reported |
-| Reported total (in+out) | 259,264 | 266,058 | 221,338 | 281,291 |
+| Reported total (in+out) | 259,264 | 266,058 | 221,338 | 707,647 |
 
 Cached input aggregates cache-creation + cache-read where the source separates
-them (Run F: `558,915 + 5,606,687`; Run 3: `800,673 + 26,683,975`). No monetary
+them (Run F: `558,915 + 5,606,687`; Run 3: `1,594,974 + 84,408,487`). No monetary
 cost delta is calculated: every session above was subscription/plan-metered
 (Claude Max plan for Fable/Opus; Codex plan for Runs 1–2) with no per-token
 dollar cost recorded in any transcript, and exact billing rates were not
